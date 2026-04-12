@@ -23,11 +23,6 @@ agent-skills/
 | `agentflow` | project-orchestrate, phase-execute, task-implement | Three-tier project execution pipeline |
 | `utils` | yolo | Standalone utility skills |
 
-## Skill Sources
-
-- **agentflow skills** — canonical source is `D:\Projects\agentflow\plugin\skills\`. When those skills change, copy them here.
-- **yolo** — canonical source is `C:\Users\greg\.claude\skills\yolo\SKILL.md`. Update here when that changes.
-
 ## Adding a Skill
 
 1. Create `skills/<skill-name>/SKILL.md` — frontmatter `name` must exactly match the folder name
