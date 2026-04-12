@@ -11,21 +11,21 @@
     {
       "name": "agentflow",
       "description": "Three-tier project execution: orchestrate a project, execute a phase, implement a task",
-      "source": "./",
+      "source": "./skills/agentflow",
       "strict": false,
       "skills": [
-        "./skills/project-orchestrate",
-        "./skills/phase-execute",
-        "./skills/task-implement"
+        "./project-orchestrate",
+        "./phase-execute",
+        "./task-implement"
       ]
     },
     {
       "name": "utils",
       "description": "Utility skills for agentic workflows",
-      "source": "./",
+      "source": "./skills/utils",
       "strict": false,
       "skills": [
-        "./skills/yolo"
+        "./yolo"
       ]
     }
   ]

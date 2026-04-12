@@ -9,10 +9,12 @@ agent-skills/
 ├── .claude-plugin/
 │   └── marketplace.json     ← plugin registry
 ├── skills/
-│   ├── project-orchestrate/ ─┐
-│   ├── phase-execute/        ├─ agentflow plugin
-│   ├── task-implement/      ─┘
-│   └── yolo/                ← utils plugin
+│   ├── agentflow/           ← agentflow plugin source
+│   │   ├── project-orchestrate/
+│   │   ├── phase-execute/
+│   │   └── task-implement/
+│   └── utils/               ← utils plugin source
+│       └── yolo/
 └── README.md
 ```
 
@@ -25,22 +27,23 @@ agent-skills/
 
 ## Adding a Skill
 
-1. Create `skills/<skill-name>/SKILL.md` — frontmatter `name` must exactly match the folder name
-2. Add the path to the appropriate plugin in `.claude-plugin/marketplace.json`
+1. Create `skills/<plugin-name>/<skill-name>/SKILL.md` — frontmatter `name` must exactly match the folder name
+2. Add `"./skill-name"` to the appropriate plugin's `skills` array in `.claude-plugin/marketplace.json`
 3. If it doesn't fit an existing plugin, add a new plugin entry in the manifest
 4. Update README.md
 
 ## Adding a Plugin
 
-Add a new entry to `.claude-plugin/marketplace.json`:
+1. Create `skills/<plugin-name>/` directory
+2. Add a new entry to `.claude-plugin/marketplace.json`:
 
 ```json
 {
   "name": "plugin-name",
   "description": "...",
-  "source": "./",
+  "source": "./skills/plugin-name",
   "strict": false,
-  "skills": ["./skills/skill-one", "./skills/skill-two"]
+  "skills": ["./skill-one", "./skill-two"]
 }
 ```
 
