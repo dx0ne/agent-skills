@@ -1,0 +1,32 @@
+{
+  "name": "dx0ne-agent-skills",
+  "owner": {
+    "name": "dx0ne"
+  },
+  "metadata": {
+    "description": "dx0ne's agent skills",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "agentflow",
+      "description": "Three-tier project execution: orchestrate a project, execute a phase, implement a task",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/project-orchestrate",
+        "./skills/phase-execute",
+        "./skills/task-implement"
+      ]
+    },
+    {
+      "name": "utils",
+      "description": "Utility skills for agentic workflows",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/yolo"
+      ]
+    }
+  ]
+}
