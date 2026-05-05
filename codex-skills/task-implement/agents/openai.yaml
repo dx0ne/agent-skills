@@ -1,0 +1,4 @@
+interface:
+  display_name: "Task Implement"
+  short_description: "Complete one tracked task file"
+  default_prompt: "Use $task-implement to execute a specific `.tasks/` task file end to end."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Orchestrate"
+  short_description: "Set up phased project task tracking"
+  default_prompt: "Use $project-orchestrate to create a `.tasks/` project plan from a brief."

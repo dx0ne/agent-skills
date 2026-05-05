@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phase Execute"
+  short_description: "Run one tracked project phase"
+  default_prompt: "Use $phase-execute to continue the current open phase in `.tasks/`."

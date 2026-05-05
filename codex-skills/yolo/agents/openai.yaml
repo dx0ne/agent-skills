@@ -1,0 +1,4 @@
+interface:
+  display_name: "Yolo Git Submit"
+  short_description: "Stage, commit, and push once"
+  default_prompt: "Use $yolo to stage, commit, and push the current branch without extra prompts."
