@@ -11,7 +11,7 @@ This repo currently ships the same core workflow in two packaging styles:
 
 ### agentflow
 
-Three-tier project execution pipeline designed for multi-session agentic work. All state lives in a `.tasks/` folder tracked in git, so any later session can reconstruct project state by reading it.
+Project execution workflow designed for multi-session agentic work. All state lives in a `.tasks/` folder tracked in git, so any later session can reconstruct project state by reading it.
 
 ```text
 project-orchestrate  ->  phase-execute  ->  task-implement
@@ -106,6 +106,7 @@ Example:
   project-orchestrate/
   phase-execute/
   task-implement/
+  project-status/
   yolo/
 ```
 
@@ -119,6 +120,7 @@ On Windows, that usually means copying these folders:
 - `codex-skills/project-orchestrate`
 - `codex-skills/phase-execute`
 - `codex-skills/task-implement`
+- `codex-skills/project-status`
 - `codex-skills/yolo`
 
 Example copy commands:
@@ -130,6 +132,7 @@ mkdir -p ~/.codex/skills
 cp -R codex-skills/project-orchestrate ~/.codex/skills/
 cp -R codex-skills/phase-execute ~/.codex/skills/
 cp -R codex-skills/task-implement ~/.codex/skills/
+cp -R codex-skills/project-status ~/.codex/skills/
 cp -R codex-skills/yolo ~/.codex/skills/
 ```
 
@@ -140,6 +143,7 @@ New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
 Copy-Item -Recurse -Force ".\codex-skills\project-orchestrate" "$HOME\.codex\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\phase-execute" "$HOME\.codex\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\task-implement" "$HOME\.codex\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\project-status" "$HOME\.codex\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\yolo" "$HOME\.codex\skills\"
 ```
 
@@ -153,7 +157,8 @@ The current OpenAI docs describe skills as installed in Codex and then invoked i
 For either agent:
 
 1. Start a new project session and invoke `project-orchestrate`.
-2. Start a new session for each phase and invoke `phase-execute`.
-3. Use `task-implement` for direct single-task execution when needed.
+2. Use `project-status` whenever a session needs a read-only progress brief.
+3. Start a new session for each phase and invoke `phase-execute`.
+4. Use `task-implement` for direct single-task execution when needed.
 
 For Codex specifically, `phase-execute` may perform tasks in the current agent instead of automatically dispatching subagents.

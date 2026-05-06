@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Status"
+  short_description: "Report tracked project progress"
+  default_prompt: "Use $project-status to summarize the current `.tasks/` project without modifying files."

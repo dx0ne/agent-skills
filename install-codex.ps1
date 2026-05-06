@@ -7,6 +7,7 @@ $skills = @(
     "project-orchestrate",
     "phase-execute",
     "task-implement",
+    "project-status",
     "yolo"
 )
 
