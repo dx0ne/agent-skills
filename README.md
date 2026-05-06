@@ -29,6 +29,10 @@ Run one phase from `.tasks/`. Open the next pending phase when needed, execute o
 
 Execute one tracked task end to end: read the task file, mark it in progress, implement the work, verify acceptance criteria, fill in notes, and return `DONE`, `DONE_WITH_CONCERNS`, or `BLOCKED`.
 
+**`project-status`**
+
+Read-only status report. Summarize project and phase progress, surface blockers, and suggest the next action — without modifying any files. Use mid-flight to brief yourself on a project, or to ask "where are we?"
+
 **Task file structure** (`.tasks/phase-N/task-NN-name.md`)
 
 ```yaml

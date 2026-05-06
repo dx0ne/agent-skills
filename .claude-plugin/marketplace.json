@@ -16,7 +16,8 @@
       "skills": [
         "./project-orchestrate",
         "./phase-execute",
-        "./task-implement"
+        "./task-implement",
+        "./project-status"
       ]
     },
     {
