@@ -7,14 +7,23 @@ Public skill distribution repo for Claude Code and compatible agents. Conforms t
 ```
 agent-skills/
 ├── .claude-plugin/
-│   └── marketplace.json     ← plugin registry
-├── skills/
-│   ├── agentflow/           ← agentflow plugin source
+│   └── marketplace.json     ← Claude plugin registry
+├── skills/                  ← Claude-compatible plugin layout
+│   ├── agentflow/
 │   │   ├── project-orchestrate/
 │   │   ├── phase-execute/
-│   │   └── task-implement/
-│   └── utils/               ← utils plugin source
+│   │   ├── task-implement/
+│   │   └── project-status/
+│   └── utils/
 │       └── yolo/
+├── codex-skills/            ← Codex-native standalone skills (parallel to skills/)
+│   ├── project-orchestrate/
+│   ├── phase-execute/
+│   ├── task-implement/
+│   ├── project-status/
+│   └── yolo/
+├── install-codex.sh         ← Codex install helper (bash)
+├── install-codex.ps1        ← Codex install helper (PowerShell)
 └── README.md
 ```
 
@@ -22,15 +31,20 @@ agent-skills/
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
-| `agentflow` | project-orchestrate, phase-execute, task-implement | Three-tier project execution pipeline |
+| `agentflow` | project-orchestrate, phase-execute, task-implement, project-status | Three-tier project execution pipeline plus read-only status |
 | `utils` | yolo | Standalone utility skills |
+
+## Codex parallel layout
+
+The repo ships the same core workflow in two packaging styles: `skills/` for Claude (plugin manifest) and `codex-skills/` for Codex (standalone skill folders, each with `SKILL.md` + `agents/openai.yaml`). They are intentionally similar but not identical — the Codex `phase-execute` defaults to serial execution, and Codex ports drop Claude-specific model routing and co-author behavior. See README.md for Codex install commands.
 
 ## Adding a Skill
 
 1. Create `skills/<plugin-name>/<skill-name>/SKILL.md` — frontmatter `name` must exactly match the folder name
 2. Add `"./skill-name"` to the appropriate plugin's `skills` array in `.claude-plugin/marketplace.json`
 3. If it doesn't fit an existing plugin, add a new plugin entry in the manifest
-4. Update README.md
+4. **If the skill should also run in Codex**: create `codex-skills/<skill-name>/SKILL.md` and `codex-skills/<skill-name>/agents/openai.yaml`, then add the corresponding copy lines to `install-codex.sh` and `install-codex.ps1`. Not every skill needs a Codex port — port when the workflow is agent-agnostic.
+5. Update README.md
 
 ## Adding a Plugin
 
