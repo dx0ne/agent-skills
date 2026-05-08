@@ -87,22 +87,25 @@ npx skills add dx0ne/agent-skills
 
 ### Codex
 
-Copy each desired skill folder from `codex-skills/` into your Codex skills directory, usually `~/.codex/skills/`.
+Codex discovers skills from repository, user, admin, and system locations. For project-specific skills, place skill folders under `.agents/skills` in the repository or a parent folder of the directory where you launch Codex. Codex scans `.agents/skills` from the current working directory up to the repository root. See the [OpenAI Codex skills docs](https://developers.openai.com/codex/skills).
 
-If you want a one-command install, use the helper scripts in this repo:
-
-```bash
-./install-codex.sh
-```
-
-```powershell
-.\install-codex.ps1
-```
-
-Example:
+Use the repository scope when the workflow should live with a project and be shared by everyone working in that repo:
 
 ```text
-~/.codex/skills/
+your-project/
+  .agents/
+    skills/
+      project-orchestrate/
+      phase-execute/
+      task-implement/
+      project-status/
+      yolo/
+```
+
+Use the user scope when the skills should be available across all repos for your own Codex setup:
+
+```text
+~/.agents/skills/
   project-orchestrate/
   phase-execute/
   task-implement/
@@ -110,47 +113,80 @@ Example:
   yolo/
 ```
 
-Each Codex skill folder should contain:
+This repository stores Codex-native skill folders in `codex-skills/`. Each installed Codex skill folder should contain:
 
 - `SKILL.md`
 - `agents/openai.yaml`
 
-On Windows, that usually means copying these folders:
+If you want a one-command install, use the helper scripts in this repo.
 
-- `codex-skills/project-orchestrate`
-- `codex-skills/phase-execute`
-- `codex-skills/task-implement`
-- `codex-skills/project-status`
-- `codex-skills/yolo`
-
-Example copy commands:
-
-**macOS / Linux**
+Install into a project repository:
 
 ```bash
-mkdir -p ~/.codex/skills
-cp -R codex-skills/project-orchestrate ~/.codex/skills/
-cp -R codex-skills/phase-execute ~/.codex/skills/
-cp -R codex-skills/task-implement ~/.codex/skills/
-cp -R codex-skills/project-status ~/.codex/skills/
-cp -R codex-skills/yolo ~/.codex/skills/
+./install-codex.sh --repo /path/to/your/project
 ```
-
-**Windows PowerShell**
 
 ```powershell
-New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
-Copy-Item -Recurse -Force ".\codex-skills\project-orchestrate" "$HOME\.codex\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\phase-execute" "$HOME\.codex\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\task-implement" "$HOME\.codex\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\project-status" "$HOME\.codex\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\yolo" "$HOME\.codex\skills\"
+.\install-codex.ps1 -repo D:\path\to\your\project
 ```
 
-The current OpenAI docs describe skills as installed in Codex and then invoked inside threads or projects. They do not currently document project-specific skill installation. The safe assumption is:
+Install into your user scope:
 
-- skills are installed at the Codex app or user level
-- projects are folder-scoped workspaces where you use those installed skills
+```bash
+./install-codex.sh
+```
+
+```powershell
+.\install-codex.ps1 -user
+```
+
+You can also copy selected skills manually.
+
+**Project install, macOS / Linux**
+
+```bash
+mkdir -p .agents/skills
+cp -R codex-skills/project-orchestrate .agents/skills/
+cp -R codex-skills/phase-execute .agents/skills/
+cp -R codex-skills/task-implement .agents/skills/
+cp -R codex-skills/project-status .agents/skills/
+cp -R codex-skills/yolo .agents/skills/
+```
+
+**Project install, Windows PowerShell**
+
+```powershell
+New-Item -ItemType Directory -Force ".\.agents\skills" | Out-Null
+Copy-Item -Recurse -Force ".\codex-skills\project-orchestrate" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\phase-execute" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\task-implement" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\project-status" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\yolo" ".\.agents\skills\"
+```
+
+**User install, macOS / Linux**
+
+```bash
+mkdir -p ~/.agents/skills
+cp -R codex-skills/project-orchestrate ~/.agents/skills/
+cp -R codex-skills/phase-execute ~/.agents/skills/
+cp -R codex-skills/task-implement ~/.agents/skills/
+cp -R codex-skills/project-status ~/.agents/skills/
+cp -R codex-skills/yolo ~/.agents/skills/
+```
+
+**User install, Windows PowerShell**
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
+Copy-Item -Recurse -Force ".\codex-skills\project-orchestrate" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\phase-execute" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\task-implement" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\project-status" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\yolo" "$HOME\.agents\skills\"
+```
+
+If multiple installed skills share the same `name`, Codex does not merge them. Keep repo-scoped skill names distinct from user-scoped variants unless you intentionally want both to appear in skill selectors.
 
 ## Typical Workflow
 
