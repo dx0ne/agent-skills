@@ -1,11 +1,18 @@
 ---
 name: project-orchestrate
-description: Set up a persistent, git-tracked `.tasks/` project plan from a `brief.md` or a direct project request. Use when Codex needs to start a new multi-phase software project, create phase/task files for future sessions, initialize project tracking, or convert a rough brief into structured execution state.
+description: Set up a persistent, git-tracked `.tasks/` project plan from a `brief.md` or a direct project request, OR extend an existing `.tasks/` project by appending new phases. Use when Codex needs to start a new multi-phase software project, create phase/task files for future sessions, initialize project tracking, convert a rough brief into structured execution state, or add a phase to a project (with or without an `extension.md`).
 ---
 
 # Project Orchestrate
 
-Create the initial `.tasks/` workspace for a project that will be executed over multiple sessions. Treat `.tasks/` as the source of truth for project state.
+Create the initial `.tasks/` workspace for a project that will be executed over multiple sessions, or extend an existing one with new phases. Treat `.tasks/` as the source of truth for project state.
+
+## Routing
+
+First action: check whether `.tasks/project.md` exists.
+
+- **Absent** → run the **Bootstrap** flow (Steps 1–6 below).
+- **Present** → run the **Extension** flow (Steps E1–E5 in "Extending a Project").
 
 ## Workflow
 
@@ -129,6 +136,68 @@ After scaffolding:
 - summarize the phases created
 - state how many Phase 1 tasks were generated
 - tell the next agent or session to use `$phase-execute`
+
+## Extending a Project
+
+Use this flow when `.tasks/project.md` already exists and the user wants to append new phases — either after the project was marked `done` or mid-stream while a phase is still open. Closed phases are never modified.
+
+`extension.md` uses the same `phases:` shape as `brief.md`. It does not re-declare `title` or `repo` — those already live in `project.md`.
+
+```yaml
+---
+phases:
+  - name: UI Polish
+    goal: Address feedback from user testing on dashboard
+    exit-criteria: |
+      - All flagged dashboard issues resolved
+  - name: Performance pass
+    goal: Reduce dashboard p95 load to <500ms
+---
+## Notes
+Free-form context the assistant should read before generating tasks.
+```
+
+### Step E1: Detect extension mode
+
+Read `.tasks/project.md`. Capture from frontmatter: `title`, `status`, `current-phase`. From `## Phases`, capture each entry and its checkbox state.
+
+### Step E2: Load existing phase state
+
+Glob `.tasks/phase-*/phase.md`. Parse each frontmatter (`phase`, `title`, `status`, `opened`, `closed`). Compute the highest existing phase number `K` from the `phase:` field — do not rely on folder lexical sort, since `phase-10` would sort before `phase-2`. Note whether any phase has `status: open`.
+
+### Step E3: Gather new phases
+
+Look for `extension.md` in the repo root. If present, read its `phases:` list and any `## Notes` section.
+
+If absent, ask the user:
+- What new work needs to happen?
+- How would you split it into phases (if more than one)?
+- Any exit criteria for each?
+
+### Step E4: Append phases
+
+For each new phase, numbering from `K+1`:
+
+- Append `- [ ] Phase N: <title>` to `## Phases` in `.tasks/project.md`.
+- Create `.tasks/phase-N/phase.md` with `status: pending`, `opened: ~`, `closed: ~`, the goal, exit criteria, and an empty Tasks list. Do not pre-generate task files — `$phase-execute` generates them when it opens the phase.
+- Update `.tasks/project.md` frontmatter:
+  - If `status: done`, flip to `status: in-progress`.
+  - Set `current-phase` to the lowest phase number with `status: open` or `status: pending`. If a phase is already open, leave `current-phase` on it; otherwise it becomes `K+1`.
+- Do not modify any closed phase's files or `closed:` date. Do not modify task files inside closed phases.
+
+### Step E5: Commit and hand off
+
+- If `extension.md` was used, delete it so a later run does not reapply it and `$project-status` does not keep flagging it.
+- Commit: `chore(tasks): extend with N phase(s) — <comma-separated titles>`.
+- Do not push automatically. This Codex port keeps the same local-first stance as the bootstrap flow: only push or perform GitHub operations when the user explicitly asks.
+- Tell the user: "Added Phase K+1..K+N. Start a new session and invoke `$phase-execute` to begin."
+
+## Edge Cases
+
+- **Mid-stream extension while a phase is open** — append after the open phase. Don't touch the open phase or its tasks. `current-phase` stays on the open phase.
+- **`extension.md` exists but `.tasks/` doesn't** — stop and tell the user: "Found extension.md but no .tasks/ project. Did you mean brief.md?" Do not auto-rename or proceed.
+- **Project status was `done`** — flip to `in-progress`. Leave closed phases' `closed:` dates intact and untouched.
+- **User wants tasks pre-filled in the new phase** — out of scope here. Tasks are deferred to `$phase-execute`. The user can edit `phase-N/phase.md` directly if they want explicit task control.
 
 ## Rules
 
