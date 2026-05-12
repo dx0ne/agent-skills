@@ -19,7 +19,7 @@ project-orchestrate  ->  phase-execute  ->  task-implement
 
 **`project-orchestrate`**
 
-Initialize a project-level `.tasks/` workspace from a `brief.md` or direct project request. Create `project.md`, `phase.md` files, and Phase 1 task files.
+Initialize a project-level `.tasks/` workspace from a `brief.md` or direct project request. Create `project.md`, `phase.md` files, and Phase 1 task files. Also extends an existing `.tasks/` project — drop an `extension.md` (same `phases:` shape as `brief.md`) or invoke without one for an interview.
 
 **`phase-execute`**
 
