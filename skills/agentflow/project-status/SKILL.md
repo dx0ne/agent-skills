@@ -120,6 +120,7 @@ Use `[x]` for closed phases, `[>]` for the open phase, `[ ]` for pending. If the
 - **No open phase, pending phases remain** → Next Action = "Invoke `phase-execute` to open Phase N."
 - **All phases closed** → "Project complete." Skip Blockers and Next Action.
 - **Open phase has no task files yet** → "Phase has no tasks yet. Invoke `phase-execute` to generate them."
+- **`extension.md` exists at repo root** → append a line to the report: "Pending extension brief detected — invoke `project-orchestrate` to append." Do not read or modify the file.
 - **Not a git repo** → omit the Recent Activity section silently.
 
 ## Key Rules

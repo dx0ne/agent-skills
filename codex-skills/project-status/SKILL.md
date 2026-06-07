@@ -109,6 +109,8 @@ Resume `task-04-<name>` (in-progress): <title>
 
 Use `[x]` for closed phases, `[>]` for the open phase, and `[ ]` for pending phases. If there are no blockers, write `No blockers.` If the project is complete, omit Blockers and Next Action.
 
+If `extension.md` exists at the repo root, append one line to the report: "Pending extension brief detected — invoke `$project-orchestrate` to append." Do not read or modify the file.
+
 ## Rules
 
 - Read current file state every time; never rely on prior conversation.
