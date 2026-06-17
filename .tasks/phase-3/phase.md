@@ -1,8 +1,8 @@
 ---
 phase: 3
 title: project-specify skill, registration & docs
-status: pending
-opened: ~
+status: open
+opened: 2026-06-17
 closed: ~
 ---
 ## Goal
@@ -25,3 +25,5 @@ and hands off by invoking `agentflow:project-orchestrate` (never `superpowers:wr
 - `README.md` documents `project-specify` and the specify→orchestrate flow.
 
 ## Tasks
+- [ ] task-01-create-project-specify-skill.md
+- [ ] task-02-register-and-document.md
