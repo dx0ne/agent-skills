@@ -1,7 +1,7 @@
 ---
 id: task-01
 title: Create the agentflow:project-specify skill
-status: pending
+status: in-progress
 complexity: high
 blocked-by: ~
 ---
