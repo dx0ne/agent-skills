@@ -1,7 +1,7 @@
 ---
 id: task-01
 title: Claude project-status detects unconsumed specs in .tasks/specs/
-status: pending
+status: in-progress
 complexity: medium
 blocked-by: ~
 ---
