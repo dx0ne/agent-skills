@@ -5,15 +5,13 @@
 
 ## Problem
 
-The agentflow pipeline (`project-orchestrate` → `phase-execute` → `task-implement` → `project-status`) has no front-end for turning a raw idea into a structured project. Users currently rely on the superpowers `brainstorming` skill for the design dialogue, but that skill **hard-codes its terminal state to `superpowers:writing-plans`** — which produces a flat `docs/superpowers/plans/*.md` file, not agentflow's `.tasks/` phased structure.
-
-The result: after a spec is written, the user must *explicitly* redirect the agent into agentflow's `project-orchestrate`. Nothing routes there automatically. The handoff seam between "spec" and "agentflow planning" is the entire pain point.
+The agentflow pipeline (`project-orchestrate` → `phase-execute` → `task-implement` → `project-status`) has no front-end for turning a raw idea into a structured project. The design dialogue has to happen ad hoc, and the resulting spec must then be *manually* redirected into `project-orchestrate` — nothing routes there automatically. The handoff seam between "spec" and "agentflow planning" is the entire pain point.
 
 Separately, `project-orchestrate`'s current input contract uses two fixed-name files in the repo root — `brief.md` (Bootstrap) and `extension.md` (Extend). A fixed name can hold only one spec at a time, has no provenance, and gives the user no way to keep or point at a *particular* spec across a project's life.
 
 ## Goal
 
-1. Add a self-contained agentflow skill, **`agentflow:project-specify`**, that owns the design dialogue end-to-end and hands off to `project-orchestrate` instead of `writing-plans`. It replaces `superpowers:brainstorming` for agentflow project work.
+1. Add a self-contained agentflow skill, **`agentflow:project-specify`**, that owns the design dialogue end-to-end and hands off directly to `project-orchestrate`. It is the design front-end for agentflow project work.
 2. Replace `project-orchestrate`'s fixed-name input files (`brief.md`, `extension.md`) with a **dated-spec folder** at `.tasks/specs/`, holding immutable `YYYY-MM-DD-<slug>.md` specs selected by content, with consumption tracked in `project.md`.
 
 ## Non-Goals (YAGNI)
@@ -86,7 +84,7 @@ The structured fields drive `project-orchestrate`; the prose sections make the f
 
 ### project-specify behavior
 
-Mirrors the disciplined dialogue of `superpowers:brainstorming`:
+Runs a disciplined design dialogue:
 
 1. Explore project context (files, docs, recent commits).
 2. Interview the user **one question at a time** (multiple-choice preferred): purpose, constraints, success criteria.
@@ -96,7 +94,7 @@ Mirrors the disciplined dialogue of `superpowers:brainstorming`:
 6. Write `.tasks/specs/YYYY-MM-DD-<slug>.md` (creating `.tasks/specs/` if needed).
 7. Spec self-review (placeholder scan, internal consistency, scope, ambiguity).
 8. Ask the user to review the written spec file.
-9. **Terminal state:** invoke `agentflow:project-orchestrate`, passing the spec path (never `writing-plans`).
+9. **Terminal state:** invoke `agentflow:project-orchestrate`, passing the spec path.
 
 A `<HARD-GATE>`: no implementation, no scaffolding, no invoking `project-orchestrate` until the design is presented and the user approves the written spec.
 
@@ -118,12 +116,12 @@ agentflow:project-orchestrate
 phase-execute → task-implement
 ```
 
-### Winning the trigger over superpowers
+### Trigger strategy
 
-Both skills claim the same "before creative work" territory, so two reinforcing mechanisms make `project-specify` win:
+`project-specify` should fire whenever the user starts new project work:
 
 1. A strong `description` triggering on "new project," "build X," "new feature," "design this," "plan this project," "spec this out."
-2. A routing line in this repo's `CLAUDE.md` (and optionally the user's global one): *"For new project work, prefer `agentflow:project-specify` over `superpowers:brainstorming`."*
+2. Document it in this repo's `CLAUDE.md` so it's the obvious entry point for any work that becomes a `.tasks/` project.
 
 ## Files Changed
 
@@ -145,7 +143,7 @@ Both skills claim the same "before creative work" territory, so two reinforcing 
 ## Acceptance Criteria
 
 - [ ] `skills/agentflow/project-specify/SKILL.md` exists; `name` frontmatter equals `project-specify`; passes agentskills.io name rules; body < 500 lines.
-- [ ] `project-specify` writes `.tasks/specs/YYYY-MM-DD-<slug>.md` with `kind` and the documented fields, and its terminal step invokes `agentflow:project-orchestrate` (not `writing-plans`).
+- [ ] `project-specify` writes `.tasks/specs/YYYY-MM-DD-<slug>.md` with `kind` and the documented fields, and its terminal step invokes `agentflow:project-orchestrate`.
 - [ ] `project-orchestrate` (both trees) selects a spec from `.tasks/specs/` (explicit path, else newest unconsumed, else ask), validates `kind` against mode, and records consumption in `project.md`'s `## Specs` log.
 - [ ] Extend mode consumes a `kind: extension` spec from `.tasks/specs/`; closed phases untouched.
 - [ ] `brief.md` / `extension.md` still work as documented deprecated fallbacks.

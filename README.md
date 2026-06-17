@@ -19,9 +19,7 @@ project-specify  ->  project-orchestrate  ->  phase-execute  ->  task-implement
 
 **`project-specify`**
 
-Turn a raw idea into a reviewed, dated spec — then hand off to `project-orchestrate`. Runs a disciplined interview (one question at a time, multiple-choice preferred), proposes 2–3 approaches with trade-offs, presents the design in sections for approval, then writes an immutable dated spec to `.tasks/specs/YYYY-MM-DD-<slug>.md`. A `<HARD-GATE>` prevents any implementation or orchestration until both the design and the written spec file are explicitly approved by the user. Terminal state is always `agentflow:project-orchestrate` — never `superpowers:writing-plans`.
-
-Prefer this over `superpowers:brainstorming` for any work that will become an agentflow `.tasks/` project.
+Turn a raw idea into a reviewed, dated spec — then hand off to `project-orchestrate`. Runs a disciplined interview (one question at a time, multiple-choice preferred), proposes 2–3 approaches with trade-offs, presents the design in sections for approval, then writes an immutable dated spec to `.tasks/specs/YYYY-MM-DD-<slug>.md`. A `<HARD-GATE>` prevents any implementation or orchestration until both the design and the written spec file are explicitly approved by the user. Terminal state is always `agentflow:project-orchestrate`, so a raw idea flows straight into the phased `.tasks/` structure.
 
 **`project-orchestrate`**
 
@@ -70,7 +68,6 @@ The Claude and Codex versions are intentionally similar, but they are not identi
 - The Codex skills live under `codex-skills/` as standalone skill folders.
 - The Codex `phase-execute` port defaults to serial execution and only delegates to subagents when the user explicitly wants delegation or parallel agent work.
 - The Codex ports remove Claude-specific model routing and Claude-specific co-author behavior.
-- The Codex `project-specify` drops the `superpowers:brainstorming` routing framing (superpowers is Claude-only); it is simply the agentflow design front-end that hands off to `project-orchestrate`.
 
 ## Install
 
@@ -209,7 +206,7 @@ For Claude Code (full pipeline):
 4. Start a new session for each phase and invoke `phase-execute`.
 5. Use `task-implement` for direct single-task execution when needed.
 
-For Codex (same pipeline; superpowers routing is Claude-only):
+For Codex (same pipeline):
 
 1. Start a new project session and invoke `project-specify` — interview → design → write spec → approve.
 2. `project-specify` hands off to `project-orchestrate`, which builds the `.tasks/` structure from the approved spec.

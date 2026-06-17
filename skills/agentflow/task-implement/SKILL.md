@@ -19,7 +19,7 @@ Executes a single task from a `.tasks/phase-N/task-NN-name.md` file. Handles the
 digraph implement {
     "Load task file" [shape=box];
     "Set status: in-progress + commit" [shape=box];
-    "Invoke TDD skill" [shape=box];
+    "Write test first" [shape=box];
     "Implement" [shape=box];
     "Blocked?" [shape=diamond];
     "Run verification" [shape=box];
@@ -30,8 +30,8 @@ digraph implement {
     "Return BLOCKED" [shape=doublecircle];
 
     "Load task file" -> "Set status: in-progress + commit";
-    "Set status: in-progress + commit" -> "Invoke TDD skill";
-    "Invoke TDD skill" -> "Implement";
+    "Set status: in-progress + commit" -> "Write test first";
+    "Write test first" -> "Implement";
     "Implement" -> "Blocked?";
     "Blocked?" -> "Run verification" [label="no"];
     "Blocked?" -> "Fill Notes + set blocked + commit" [label="yes"];
@@ -60,9 +60,12 @@ Commit: `chore(task-NN): start — <title>`
 
 ### Step 3 — Implement with TDD
 
-Invoke `superpowers:test-driven-development` before writing any implementation code.
+Write tests before implementation:
+- Write a failing test that captures the desired behavior, then run it to confirm it fails for the right reason.
+- Write the minimal code to make it pass, then run the tests again.
+- Refactor once green. Commit at meaningful checkpoints.
 
-Use `superpowers:systematic-debugging` if you hit unexpected failures.
+If you hit unexpected failures, debug systematically — reproduce the failure, form one hypothesis at a time, and confirm the root cause before changing code. Don't guess-and-check.
 
 If you realize the task is blocked (missing dependency, ambiguous requirement, external blocker):
 - Stop immediately — do not guess or work around
@@ -73,7 +76,7 @@ If you realize the task is blocked (missing dependency, ambiguous requirement, e
 
 ### Step 4 — Verify
 
-Invoke `superpowers:verification-before-completion` before marking done.
+Before marking done, verify against reality — run the relevant tests, checks, or commands and confirm the actual output rather than assuming. Evidence before claims.
 
 Check each acceptance criterion in the task file:
 - Update `- [ ]` to `- [x]` for each criterion met

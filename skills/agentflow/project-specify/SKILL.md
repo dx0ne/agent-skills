@@ -1,21 +1,19 @@
 ---
 name: project-specify
-description: Use at the very start of agentflow project work to turn a raw idea into a reviewed, dated spec — then hand off to project-orchestrate. Triggers on "new project", "build X", "let's build", "new feature", "design this", "spec this out", "plan this project", "I want to make", or any request to design or scope a project before any code is written. Prefer this over superpowers:brainstorming for agentflow work, because its terminal handoff is agentflow:project-orchestrate (the .tasks/ planner), never superpowers:writing-plans.
+description: Use at the very start of agentflow project work to turn a raw idea into a reviewed, dated spec — then hand off to project-orchestrate. Triggers on "new project", "build X", "let's build", "new feature", "design this", "spec this out", "plan this project", "I want to make", or any request to design or scope a project before any code is written. Its terminal handoff is agentflow:project-orchestrate (the .tasks/ planner).
 ---
 
 # Project Specify
 
 Owns the design dialogue at the front of the agentflow pipeline. Runs a disciplined interview, proposes approaches, presents a design for approval, writes an immutable dated spec to `.tasks/specs/`, and hands off to `agentflow:project-orchestrate` — which converts the spec into the `.tasks/` phased structure.
 
-This skill exists to fix one seam: `superpowers:brainstorming` hard-codes its terminal state to `superpowers:writing-plans`, which produces a flat `docs/superpowers/plans/*.md` file — **not** agentflow's phased `.tasks/` structure. `project-specify` is the agentflow-native replacement: same disciplined dialogue, but it routes to `project-orchestrate` instead.
+It is the design front-end of the agentflow pipeline: the disciplined dialogue happens here, and its single hard-coded terminal state is `agentflow:project-orchestrate`, so a raw idea flows straight into the phased `.tasks/` structure without any manual hand-off.
 
 ## When to Use
 
 - A user wants to start a new software project ("let's build X", "new project").
 - A user wants to add a substantial new capability to an existing `.tasks/` project ("new feature", "extend the project").
 - Any "design this / spec this out / plan this project" request that should end in agentflow's `.tasks/` workflow.
-
-**Prefer this over `superpowers:brainstorming` for agentflow work.** Use plain `brainstorming` only when the output is explicitly *not* meant to become a `.tasks/` project.
 
 <HARD-GATE>
 Do NOT implement, scaffold, create repos, write code, or invoke `agentflow:project-orchestrate` until BOTH of these are true:
@@ -166,7 +164,7 @@ Tell the user the spec path and ask them to read it and approve. If they request
 
 Once the spec is approved, **invoke `agentflow:project-orchestrate`, passing the spec path** (e.g. "orchestrate `.tasks/specs/2026-06-17-auth-system.md`"). `project-orchestrate` selects the spec, builds the `.tasks/` structure, and logs consumption in `project.md`'s `## Specs` log.
 
-**Do NOT invoke `superpowers:writing-plans`.** Routing to `writing-plans` would produce a flat plan file outside `.tasks/` and defeat the entire purpose of this skill. The hard-coded terminal state is `agentflow:project-orchestrate` and nothing else.
+The hard-coded terminal state is `agentflow:project-orchestrate` and nothing else. Do not route the approved design into any other planner, and do not start implementing tasks yourself — that is `phase-execute`.
 
 ## Key Rules
 
@@ -176,4 +174,4 @@ Once the spec is approved, **invoke `agentflow:project-orchestrate`, passing the
 - **Specs are immutable** — write a new dated file; never overwrite a prior spec in `.tasks/specs/`.
 - **Mode is inferred, not asked** — `.tasks/project.md` absent ⇒ bootstrap, present ⇒ extension; the `kind` field must agree.
 - **The spec is the contract** — its frontmatter must match exactly what `agentflow:project-orchestrate` reads (`kind`, `title`/`repo`/`goal`/`phases` for bootstrap; `phases`/`## Notes` for extension).
-- **Terminal state is `project-orchestrate`** — never `superpowers:writing-plans`. That redirect is the whole reason this skill exists.
+- **Terminal state is `project-orchestrate`** — hand the approved spec off there and nowhere else; don't advance work in this skill.
