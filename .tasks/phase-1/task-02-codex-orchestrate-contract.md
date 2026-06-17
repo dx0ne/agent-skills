@@ -1,7 +1,7 @@
 ---
 id: task-02
 title: Mirror spec-folder contract into Codex project-orchestrate
-status: pending
+status: in-progress
 complexity: medium
 blocked-by: task-01
 ---
