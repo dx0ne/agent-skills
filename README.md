@@ -14,12 +14,18 @@ This repo currently ships the same core workflow in two packaging styles:
 Project execution workflow designed for multi-session agentic work. All state lives in a `.tasks/` folder tracked in git, so any later session can reconstruct project state by reading it.
 
 ```text
-project-orchestrate  ->  phase-execute  ->  task-implement
+project-specify  ->  project-orchestrate  ->  phase-execute  ->  task-implement
 ```
+
+**`project-specify`**
+
+Turn a raw idea into a reviewed, dated spec — then hand off to `project-orchestrate`. Runs a disciplined interview (one question at a time, multiple-choice preferred), proposes 2–3 approaches with trade-offs, presents the design in sections for approval, then writes an immutable dated spec to `.tasks/specs/YYYY-MM-DD-<slug>.md`. A `<HARD-GATE>` prevents any implementation or orchestration until both the design and the written spec file are explicitly approved by the user. Terminal state is always `agentflow:project-orchestrate` — never `superpowers:writing-plans`.
+
+Prefer this over `superpowers:brainstorming` for any work that will become an agentflow `.tasks/` project.
 
 **`project-orchestrate`**
 
-Initialize a project-level `.tasks/` workspace from a `brief.md` or direct project request. Create `project.md`, `phase.md` files, and Phase 1 task files. Also extends an existing `.tasks/` project — drop an `extension.md` (same `phases:` shape as `brief.md`) or invoke without one for an interview.
+Initialize a project-level `.tasks/` workspace from a spec in `.tasks/specs/` (selected by explicit path, or the newest unconsumed spec, or a deprecated root `brief.md`). Creates `project.md`, `phase.md` files, and Phase 1 task files, then records the consumed spec in `project.md`'s `## Specs` log. Also extends an existing `.tasks/` project from a `kind: extension` spec in `.tasks/specs/` (or a deprecated root `extension.md`).
 
 **`phase-execute`**
 
@@ -190,11 +196,17 @@ If multiple installed skills share the same `name`, Codex does not merge them. K
 
 ## Typical Workflow
 
-For either agent:
+For Claude Code (full pipeline):
 
-1. Start a new project session and invoke `project-orchestrate`.
-2. Use `project-status` whenever a session needs a read-only progress brief.
-3. Start a new session for each phase and invoke `phase-execute`.
-4. Use `task-implement` for direct single-task execution when needed.
+1. Start a new project session and invoke `project-specify` — interview → design → write spec → approve.
+2. `project-specify` hands off to `project-orchestrate`, which builds the `.tasks/` structure from the approved spec.
+3. Use `project-status` whenever a session needs a read-only progress brief.
+4. Start a new session for each phase and invoke `phase-execute`.
+5. Use `task-implement` for direct single-task execution when needed.
+
+For Codex (starting from an existing spec or direct orchestration):
+
+1. Start a new project session and invoke `project-orchestrate` (Codex has no `project-specify` port yet).
+2. Continue with `phase-execute` and `task-implement` as above.
 
 For Codex specifically, `phase-execute` may perform tasks in the current agent instead of automatically dispatching subagents.
