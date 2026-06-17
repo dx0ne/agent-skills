@@ -11,6 +11,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sourceRoot = Join-Path $repoRoot "codex-skills"
 $skills = @(
+    "project-specify",
     "project-orchestrate",
     "phase-execute",
     "task-implement",

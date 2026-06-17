@@ -34,6 +34,7 @@ digraph status {
     "Open phase exists?" [shape=diamond];
     "Read open phase tasks" [shape=box];
     "Tally + find blockers + next action" [shape=box];
+    "Glob .tasks/specs/ + check ## Specs log" [shape=box];
     "Read git context" [shape=box];
     "Render report" [shape=doublecircle];
 
@@ -42,16 +43,17 @@ digraph status {
     "project.md exists?" -> "Walk phase-*/phase.md" [label="yes"];
     "Walk phase-*/phase.md" -> "Open phase exists?";
     "Open phase exists?" -> "Read open phase tasks" [label="yes"];
-    "Open phase exists?" -> "Read git context" [label="no"];
+    "Open phase exists?" -> "Glob .tasks/specs/ + check ## Specs log" [label="no"];
     "Read open phase tasks" -> "Tally + find blockers + next action";
-    "Tally + find blockers + next action" -> "Read git context";
+    "Tally + find blockers + next action" -> "Glob .tasks/specs/ + check ## Specs log";
+    "Glob .tasks/specs/ + check ## Specs log" -> "Read git context";
     "Read git context" -> "Render report";
 }
 ```
 
 ### Step 1 — Read project metadata
 
-Read `.tasks/project.md`. Capture from frontmatter: `title`, `status`, `current-phase`, `github`. From the `## Phases` section, capture each phase title and whether the checkbox is `[x]` or `[ ]`.
+Read `.tasks/project.md`. Capture from frontmatter: `title`, `status`, `current-phase`, `github`. From the `## Phases` section, capture each phase title and whether the checkbox is `[x]` or `[ ]`. Also capture the full `## Specs` log section — you will need it in Step 4.
 
 ### Step 2 — Walk phases
 
@@ -72,7 +74,20 @@ If a phase has `status: open`, glob its `task-*.md` files. For each task, read f
   - Else if no open phase but pending phases remain → "Invoke `phase-execute` to open Phase N."
   - Else if all phases closed → "Project complete."
 
-### Step 4 — Git context
+### Step 4 — Detect unconsumed specs
+
+Glob `.tasks/specs/*.md`. A spec is **consumed** if its relative path (e.g. `specs/2026-06-17-auth.md`) appears anywhere in the `## Specs` log you captured in Step 1. Log lines look like:
+
+```
+- specs/2026-06-17-auth.md (bootstrap) → phases 1-3
+- specs/2026-07-02-billing.md (extension) → phases 4-5
+```
+
+Any spec file whose path does not appear in the log is **unconsumed**. Collect the list of unconsumed spec filenames. You do not need to read spec file bodies — filenames are sufficient for detection.
+
+**Deprecated fallback check (secondary signal):** Also note if `brief.md` or `extension.md` exists at the repo root. These are the deprecated pre-spec-folder input files. If either is present and no dated spec in `.tasks/specs/` covers the same intent, surface it as a secondary signal (see report template below).
+
+### Step 5 — Git context
 
 Run only these read-only commands:
 
@@ -82,7 +97,7 @@ Run only these read-only commands:
 
 Never run mutating git commands. If the directory is not a git repo, skip this step silently.
 
-### Step 5 — Render report
+### Step 6 — Render report
 
 Output a single markdown report to the user. Do not write any files. Use this template, omitting sections that don't apply:
 
@@ -106,6 +121,11 @@ Status: <in-progress|done> · Phase <current>/<total> · Branch: <branch>
 ## Next Action
 Resume `task-04-<name>` (in-progress) — <title>
 
+## Unconsumed Specs
+- specs/2026-06-17-foo.md
+- specs/2026-07-02-bar.md
+→ Invoke `project-orchestrate` to consume these specs and generate phases.
+
 ## Recent Activity
 - <hash> <commit subject>
 - <hash> <commit subject>
@@ -114,13 +134,17 @@ Resume `task-04-<name>` (in-progress) — <title>
 
 Use `[x]` for closed phases, `[>]` for the open phase, `[ ]` for pending. If there are no blockers, write "No blockers." If the project is complete, omit Blockers and Next Action.
 
+Include the **Unconsumed Specs** section only when there is at least one unconsumed spec. List each by its relative path within `.tasks/`. If deprecated root files (`brief.md` or `extension.md`) are also present, append a note: "Deprecated root file(s) also present: `brief.md` / `extension.md` — migrate to `.tasks/specs/`."
+
 ## Edge Cases
 
 - **No `.tasks/` folder** → bootstrap hint (see Preconditions).
 - **No open phase, pending phases remain** → Next Action = "Invoke `phase-execute` to open Phase N."
 - **All phases closed** → "Project complete." Skip Blockers and Next Action.
 - **Open phase has no task files yet** → "Phase has no tasks yet. Invoke `phase-execute` to generate them."
-- **`extension.md` exists at repo root** → append a line to the report: "Pending extension brief detected — invoke `project-orchestrate` to append." Do not read or modify the file.
+- **`.tasks/specs/` has unconsumed specs** → include the Unconsumed Specs section in the report with a `project-orchestrate` hint. This is the primary detection mechanism.
+- **Deprecated root `brief.md` or `extension.md` exists** → secondary signal only; mention alongside unconsumed specs if both present, or on its own if `.tasks/specs/` is empty or absent. Do not read or modify these files.
+- **`.tasks/specs/` does not exist or is empty, but `brief.md`/`extension.md` exists at root** → surface as: "Deprecated extension/bootstrap brief detected at repo root — invoke `project-orchestrate` to consume or migrate to `.tasks/specs/`."
 - **Not a git repo** → omit the Recent Activity section silently.
 
 ## Key Rules
@@ -129,3 +153,4 @@ Use `[x]` for closed phases, `[>]` for the open phase, `[ ]` for pending. If the
 - **Source of truth is `.tasks/`.** Always read current file state — don't infer from prior conversation.
 - **One report, one response.** Don't paginate. Don't ask the user follow-up questions before reporting.
 - **Hand off, don't advance.** When work needs to move, point to `phase-execute` or `task-implement` — don't do it yourself.
+- **Spec detection is read-only.** Only read filenames from `.tasks/specs/` and the `## Specs` log from `project.md`. Never read spec file bodies for status detection, and never modify any spec or log.

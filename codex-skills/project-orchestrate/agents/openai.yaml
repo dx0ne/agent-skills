@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Orchestrate"
   short_description: "Set up or extend phased project task tracking"
-  default_prompt: "Use $project-orchestrate to create a `.tasks/` project plan from a brief, or to append phases to an existing project via extension.md."
+  default_prompt: "Use $project-orchestrate to create a `.tasks/` project plan from a spec in `.tasks/specs/`, or to append phases to an existing project via an extension spec (with extension.md as a deprecated fallback)."

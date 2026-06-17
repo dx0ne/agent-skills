@@ -10,6 +10,7 @@ agent-skills/
 │   └── marketplace.json     ← Claude plugin registry
 ├── skills/                  ← Claude-compatible plugin layout
 │   ├── agentflow/
+│   │   ├── project-specify/
 │   │   ├── project-orchestrate/
 │   │   ├── phase-execute/
 │   │   ├── task-implement/
@@ -17,6 +18,7 @@ agent-skills/
 │   └── utils/
 │       └── yolo/
 ├── codex-skills/            ← Codex-native standalone skills (parallel to skills/)
+│   ├── project-specify/
 │   ├── project-orchestrate/
 │   ├── phase-execute/
 │   ├── task-implement/
@@ -31,12 +33,25 @@ agent-skills/
 
 | Plugin | Skills | Purpose |
 |--------|--------|---------|
-| `agentflow` | project-orchestrate, phase-execute, task-implement, project-status | Three-tier project execution pipeline plus read-only status |
+| `agentflow` | project-specify, project-orchestrate, phase-execute, task-implement, project-status | Four-tier project execution pipeline: design → plan → execute → implement; plus read-only status |
 | `utils` | yolo | Standalone utility skills |
+
+### Skill routing tie-breaker
+
+For new project work or any request to spec/design/plan a project that will use the agentflow `.tasks/` workflow, **prefer `agentflow:project-specify` over `superpowers:brainstorming`**. Use plain `brainstorming` only when the output is explicitly *not* meant to become a `.tasks/` project (e.g. raw ideation, no intent to build).
+
+### `.tasks/specs/` dated-spec contract
+
+`project-specify` writes specs to `.tasks/specs/YYYY-MM-DD-<slug>.md`. Key rules:
+- **Specs are immutable history** — never edited or deleted after consumption.
+- **Selection:** explicit path wins; otherwise `project-orchestrate` consumes the newest unconsumed spec. If several unconsumed specs exist, it lists them and asks.
+- **Consumption tracking** lives in `project.md`'s `## Specs` log, not in the spec files themselves. After building phases from a spec, `project-orchestrate` appends an entry like `- specs/2026-06-17-auth-system.md (bootstrap) → phases 1-3`.
+- **Mode is inferred from state:** no `.tasks/project.md` → Bootstrap (`kind: bootstrap`); `project.md` present → Extend (`kind: extension`).
+- **`brief.md` / `extension.md`** in the repo root still work as deprecated fallbacks if `.tasks/specs/` has no usable spec, but new work should use the dated-spec folder.
 
 ## Codex parallel layout
 
-The repo ships the same core workflow in two packaging styles: `skills/` for Claude (plugin manifest) and `codex-skills/` for Codex (standalone skill folders, each with `SKILL.md` + `agents/openai.yaml`). They are intentionally similar but not identical — the Codex `phase-execute` defaults to serial execution, and Codex ports drop Claude-specific model routing and co-author behavior. See README.md for Codex install commands.
+The repo ships the same core workflow in two packaging styles: `skills/` for Claude (plugin manifest) and `codex-skills/` for Codex (standalone skill folders, each with `SKILL.md` + `agents/openai.yaml`). They are intentionally similar but not identical — the Codex `phase-execute` defaults to serial execution, Codex ports drop Claude-specific model routing and co-author behavior, and the Codex `project-specify` drops the `superpowers:brainstorming` routing framing (superpowers is Claude-only). See README.md for Codex install commands.
 
 ## Adding a Skill
 

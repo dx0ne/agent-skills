@@ -63,7 +63,20 @@ Then:
 
 If an open phase has no task files, report that the phase has no tasks yet and `$phase-execute` should generate them.
 
-### Step 5: Add git context
+### Step 5: Detect unconsumed specs
+
+Glob `.tasks/specs/*.md`. A spec is **consumed** if its relative path (e.g. `specs/2026-06-17-auth.md`) appears anywhere in the `## Specs` log from `.tasks/project.md`. Log lines look like:
+
+```
+- specs/2026-06-17-auth.md (bootstrap) → phases 1-3
+- specs/2026-07-02-billing.md (extension) → phases 4-5
+```
+
+Any spec file whose path does not appear in the log is **unconsumed**. Collect the list of unconsumed spec filenames. You do not need to read spec file bodies — filenames are sufficient for detection.
+
+**Deprecated fallback check (secondary signal):** Also note if `brief.md` or `extension.md` exists at the repo root. These are deprecated pre-spec-folder input files. If either is present and no dated spec in `.tasks/specs/` covers the same intent, surface it as a secondary signal (see report template below).
+
+### Step 6: Add git context
 
 Run only these read-only git commands:
 
@@ -77,7 +90,7 @@ If the directory is not a git repository, omit git activity silently.
 
 Never run mutating git commands.
 
-### Step 6: Render one report
+### Step 7: Render one report
 
 Return a single markdown report. Do not write files. Use this shape, omitting sections that do not apply:
 
@@ -101,6 +114,11 @@ Status: <in-progress|done> | Phase <current>/<total> | Branch: <branch>
 ## Next Action
 Resume `task-04-<name>` (in-progress): <title>
 
+## Unconsumed Specs
+- specs/2026-06-17-foo.md
+- specs/2026-07-02-bar.md
+→ Invoke `$project-orchestrate` to consume these specs and generate phases.
+
 ## Recent Activity
 - <hash> <commit subject>
 - <hash> <commit subject>
@@ -109,7 +127,18 @@ Resume `task-04-<name>` (in-progress): <title>
 
 Use `[x]` for closed phases, `[>]` for the open phase, and `[ ]` for pending phases. If there are no blockers, write `No blockers.` If the project is complete, omit Blockers and Next Action.
 
-If `extension.md` exists at the repo root, append one line to the report: "Pending extension brief detected — invoke `$project-orchestrate` to append." Do not read or modify the file.
+Include the **Unconsumed Specs** section only when there is at least one unconsumed spec. List each by its relative path within `.tasks/`. If deprecated root files (`brief.md` or `extension.md`) are also present, append a note: "Deprecated root file(s) also present: `brief.md` / `extension.md` — migrate to `.tasks/specs/`."
+
+## Edge Cases
+
+- **No `.tasks/` folder** → bootstrap hint (see Step 1).
+- **No open phase, pending phases remain** → Next Action = "Invoke `$phase-execute` to open Phase N."
+- **All phases closed** → "Project complete." Skip Blockers and Next Action.
+- **Open phase has no task files yet** → "Phase has no tasks yet. Invoke `$phase-execute` to generate them."
+- **`.tasks/specs/` has unconsumed specs** → include the Unconsumed Specs section in the report with a `$project-orchestrate` hint. This is the primary detection mechanism.
+- **Deprecated root `brief.md` or `extension.md` exists** → secondary signal only; mention alongside unconsumed specs if both present, or on its own if `.tasks/specs/` is empty or absent. Do not read or modify these files.
+- **`.tasks/specs/` does not exist or is empty, but `brief.md`/`extension.md` exists at root** → surface as: "Deprecated extension/bootstrap brief detected at repo root — invoke `$project-orchestrate` to consume or migrate to `.tasks/specs/`."
+- **Not a git repo** → omit the Recent Activity section silently.
 
 ## Rules
 
@@ -118,3 +147,4 @@ If `extension.md` exists at the repo root, append one line to the report: "Pendi
 - Keep the whole workflow read-only: do not use `apply_patch`, shell writes, file edits, phase transitions, task status updates, commits, or pushes.
 - Return one report in one response.
 - Hand off execution to `$phase-execute` or `$task-implement`; do not advance work in this skill.
+- **Spec detection is read-only.** Only read filenames from `.tasks/specs/` and the `## Specs` log from `project.md`. Never read spec file bodies for status detection, and never modify any spec or log.
