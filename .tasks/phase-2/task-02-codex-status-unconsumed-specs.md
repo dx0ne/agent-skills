@@ -1,7 +1,7 @@
 ---
 id: task-02
 title: Mirror unconsumed-spec detection into Codex project-status
-status: pending
+status: done
 complexity: low
 blocked-by: task-01
 ---
