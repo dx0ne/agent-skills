@@ -1,7 +1,7 @@
 ---
 id: task-03
 title: Update Codex openai.yaml wording brief -> spec
-status: pending
+status: done
 complexity: low
 blocked-by: task-01
 ---
@@ -16,9 +16,12 @@ rather than "from a brief", consistent with the new input contract.
 - Design spec: `docs/specs/2026-06-16-project-specify-design.md` ("Files Changed").
 
 ## Acceptance Criteria
-- [ ] `default_prompt` references creating a plan from a spec in `.tasks/specs/`.
-- [ ] Extend wording reflects the unified dated-spec mechanism (extension.md as deprecated
+- [x] `default_prompt` references creating a plan from a spec in `.tasks/specs/`.
+- [x] Extend wording reflects the unified dated-spec mechanism (extension.md as deprecated
       fallback), consistent with task-02.
-- [ ] YAML remains valid.
+- [x] YAML remains valid.
 
 ## Notes
+- Commit: 4309218 — Updated openai.yaml line 4 to reflect spec-folder contract
+- Wording kept concise (one sentence) and preserves `$project-orchestrate` reference
+- YAML structure and quoting style preserved
