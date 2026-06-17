@@ -1,7 +1,7 @@
 ---
 title: project-specify skill & spec-folder contract
 status: in-progress
-current-phase: 1
+current-phase: 2
 repo: public
 github: https://github.com/dx0ne/agent-skills.git
 created: 2026-06-17
@@ -15,7 +15,7 @@ consumption tracked in `project.md`. Full design:
 `docs/specs/2026-06-16-project-specify-design.md`.
 
 ## Phases
-- [ ] Phase 1: Orchestrate spec-folder contract
+- [x] Phase 1: Orchestrate spec-folder contract
 - [ ] Phase 2: Status unconsumed-spec detection
 - [ ] Phase 3: project-specify skill, registration & docs
 

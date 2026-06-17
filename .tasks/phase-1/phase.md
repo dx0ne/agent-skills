@@ -1,9 +1,9 @@
 ---
 phase: 1
 title: Orchestrate spec-folder contract
-status: open
+status: closed
 opened: 2026-06-17
-closed: ~
+closed: 2026-06-17
 ---
 ## Goal
 Change `project-orchestrate`'s input contract (both Claude and Codex trees) so it
