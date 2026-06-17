@@ -1,9 +1,9 @@
 ---
 phase: 2
 title: Status unconsumed-spec detection
-status: open
+status: closed
 opened: 2026-06-17
-closed: ~
+closed: 2026-06-17
 ---
 ## Goal
 Update `project-status` in both trees so it reports *unconsumed specs* in
