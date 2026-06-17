@@ -1,7 +1,7 @@
 ---
 id: task-02
 title: Register project-specify in manifest and document it
-status: pending
+status: in-progress
 complexity: medium
 blocked-by: task-01
 ---
