@@ -1,9 +1,9 @@
 ---
 phase: 3
 title: project-specify skill, registration & docs
-status: open
+status: closed
 opened: 2026-06-17
-closed: ~
+closed: 2026-06-17
 ---
 ## Goal
 Create the new `agentflow:project-specify` skill (Claude-only this iteration), register
