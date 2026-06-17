@@ -1,7 +1,7 @@
 ---
 id: task-01
 title: Rewrite Claude project-orchestrate input contract to .tasks/specs/
-status: pending
+status: in-progress
 complexity: high
 blocked-by: ~
 ---
