@@ -1,8 +1,8 @@
 ---
 phase: 2
 title: Status unconsumed-spec detection
-status: pending
-opened: ~
+status: open
+opened: 2026-06-17
 closed: ~
 ---
 ## Goal
@@ -21,3 +21,5 @@ read-only and never modify any file.
 - Claude and Codex versions stay consistent apart from known intentional differences.
 
 ## Tasks
+- [ ] task-01-claude-status-unconsumed-specs.md
+- [ ] task-02-codex-status-unconsumed-specs.md
