@@ -70,6 +70,7 @@ The Claude and Codex versions are intentionally similar, but they are not identi
 - The Codex skills live under `codex-skills/` as standalone skill folders.
 - The Codex `phase-execute` port defaults to serial execution and only delegates to subagents when the user explicitly wants delegation or parallel agent work.
 - The Codex ports remove Claude-specific model routing and Claude-specific co-author behavior.
+- The Codex `project-specify` drops the `superpowers:brainstorming` routing framing (superpowers is Claude-only); it is simply the agentflow design front-end that hands off to `project-orchestrate`.
 
 ## Install
 
@@ -152,6 +153,7 @@ You can also copy selected skills manually.
 
 ```bash
 mkdir -p .agents/skills
+cp -R codex-skills/project-specify .agents/skills/
 cp -R codex-skills/project-orchestrate .agents/skills/
 cp -R codex-skills/phase-execute .agents/skills/
 cp -R codex-skills/task-implement .agents/skills/
@@ -163,6 +165,7 @@ cp -R codex-skills/yolo .agents/skills/
 
 ```powershell
 New-Item -ItemType Directory -Force ".\.agents\skills" | Out-Null
+Copy-Item -Recurse -Force ".\codex-skills\project-specify" ".\.agents\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\project-orchestrate" ".\.agents\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\phase-execute" ".\.agents\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\task-implement" ".\.agents\skills\"
@@ -174,6 +177,7 @@ Copy-Item -Recurse -Force ".\codex-skills\yolo" ".\.agents\skills\"
 
 ```bash
 mkdir -p ~/.agents/skills
+cp -R codex-skills/project-specify ~/.agents/skills/
 cp -R codex-skills/project-orchestrate ~/.agents/skills/
 cp -R codex-skills/phase-execute ~/.agents/skills/
 cp -R codex-skills/task-implement ~/.agents/skills/
@@ -185,6 +189,7 @@ cp -R codex-skills/yolo ~/.agents/skills/
 
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
+Copy-Item -Recurse -Force ".\codex-skills\project-specify" "$HOME\.agents\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\project-orchestrate" "$HOME\.agents\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\phase-execute" "$HOME\.agents\skills\"
 Copy-Item -Recurse -Force ".\codex-skills\task-implement" "$HOME\.agents\skills\"
@@ -204,9 +209,10 @@ For Claude Code (full pipeline):
 4. Start a new session for each phase and invoke `phase-execute`.
 5. Use `task-implement` for direct single-task execution when needed.
 
-For Codex (starting from an existing spec or direct orchestration):
+For Codex (same pipeline; superpowers routing is Claude-only):
 
-1. Start a new project session and invoke `project-orchestrate` (Codex has no `project-specify` port yet).
-2. Continue with `phase-execute` and `task-implement` as above.
+1. Start a new project session and invoke `project-specify` — interview → design → write spec → approve.
+2. `project-specify` hands off to `project-orchestrate`, which builds the `.tasks/` structure from the approved spec.
+3. Continue with `phase-execute` and `task-implement` as above; use `project-status` for a read-only progress brief.
 
 For Codex specifically, `phase-execute` may perform tasks in the current agent instead of automatically dispatching subagents.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Specify"
+  short_description: "Interview, design, and write a dated spec, then hand off to project-orchestrate"
+  default_prompt: "Use $project-specify to turn an idea into a reviewed, dated spec in `.tasks/specs/` through a disciplined interview, then hand off to $project-orchestrate to build the `.tasks/` plan."
