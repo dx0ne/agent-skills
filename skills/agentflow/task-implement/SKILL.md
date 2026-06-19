@@ -60,10 +60,16 @@ Commit: `chore(task-NN): start — <title>`
 
 ### Step 3 — Implement with TDD
 
-Write tests before implementation:
-- Write a failing test that captures the desired behavior, then run it to confirm it fails for the right reason.
-- Write the minimal code to make it pass, then run the tests again.
-- Refactor once green. Commit at meaningful checkpoints.
+**The iron law: no production code without a failing test first.** If you write implementation before its test, delete it and restart from the test — don't keep it "as reference" and backfill a test that passes on the first run.
+
+Follow red-green-refactor:
+1. **Red** — write one minimal test for a single behavior. Run it and watch it fail *for the right reason* (feature missing, not a typo or import error). A test that passes immediately proves nothing.
+2. **Green** — write the simplest code that makes it pass. No extra options, config, or abstraction the test doesn't demand.
+3. **Refactor** — clean up while staying green, then write the next failing test. Commit at meaningful checkpoints.
+
+Use real code over mocks unless a dependency makes mocks unavoidable. If a test is hard to write, the design is usually the problem — simplify the interface rather than the test.
+
+Don't rationalize past this: "too simple to test", "I'll add tests after", "I already tested it manually", and "deleting this code is wasteful" all mean the same thing — write the test first.
 
 If you hit unexpected failures, debug systematically — reproduce the failure, form one hypothesis at a time, and confirm the root cause before changing code. Don't guess-and-check.
 

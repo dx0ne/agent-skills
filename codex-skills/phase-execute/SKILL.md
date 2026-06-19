@@ -51,10 +51,11 @@ If multiple tasks are unblocked and the user explicitly wants delegation, parall
 
 ### Step 5: Review task outcomes
 
-After each task:
-- reread the task file
+A `done` status is a claim, not proof — verify it, don't rubber-stamp it. After each task:
+- reread the task file fresh, not the summary
 - confirm the status is now `done` or `blocked`
-- confirm acceptance criteria were updated honestly
+- confirm each acceptance criterion is genuinely met; a checked box is an assertion, so spot-check that `## Notes` describe real work and that tests back the behavior
+- if the task warranted tests and none were written, treat the done as suspect — TDD was skipped; redo it or record the concern
 - inspect `## Notes` for follow-up risks or unresolved questions
 
 If a task is blocked, record that in the phase-level reasoning but continue with other independent tasks when possible.
@@ -80,6 +81,7 @@ Return a concise summary:
 ## Rules
 
 - Never modify closed phases unless the user explicitly asks.
+- A done status is a claim until the task file backs it; verify it, never rubber-stamp.
 - Treat `.tasks/` as the source of truth, not the conversation.
 - Prefer serial execution unless the user explicitly requests parallel delegation.
 - Do not assume subagent tools or model-routing features are available.

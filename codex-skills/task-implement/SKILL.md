@@ -31,12 +31,20 @@ status: in-progress
 
 Do this before implementing so later sessions can reconstruct state accurately.
 
-### Step 3: Implement carefully
+### Step 3: Implement with TDD
 
-Use normal Codex engineering discipline:
-- inspect the relevant code before editing
-- add or update tests when the task warrants it
-- verify behavior instead of assuming it
+Inspect the relevant code before editing, then drive the work test-first.
+
+**The iron law: no production code without a failing test first.** If you write implementation before its test, delete it and restart from the test — don't keep it "as reference" and backfill a test that passes on the first run.
+
+Follow red-green-refactor:
+1. **Red** — write one minimal test for a single behavior. Run it and watch it fail *for the right reason* (feature missing, not a typo or import error). A test that passes immediately proves nothing.
+2. **Green** — write the simplest code that makes it pass. No extra options, config, or abstraction the test doesn't demand.
+3. **Refactor** — clean up while staying green, then write the next failing test.
+
+Use real code over mocks unless a dependency makes mocks unavoidable. If a test is hard to write, the design is usually the problem — simplify the interface rather than the test.
+
+Don't rationalize past this: "too simple to test", "I'll add tests after", "I already tested it manually", and "deleting this code is wasteful" all mean the same thing — write the test first.
 
 If you discover a real blocker such as a missing dependency, conflicting requirement, missing credential, or ambiguous spec:
 - stop implementation
@@ -77,6 +85,7 @@ Use `DONE_WITH_CONCERNS` only when the acceptance criteria are met but meaningfu
 
 ## Rules
 
+- Never skip TDD; write the failing test before the implementation.
 - Read the task file fresh; do not rely on prompt summaries.
 - Keep status transitions accurate.
 - Never mark criteria complete without verification.
