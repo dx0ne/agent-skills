@@ -27,7 +27,7 @@ Initialize a project-level `.tasks/` workspace from a spec in `.tasks/specs/` (s
 
 **`phase-execute`**
 
-Run one phase from `.tasks/`. Open the next pending phase when needed, execute or supervise pending tasks, and close the phase when its tasks are complete or blocked.
+Run one phase from `.tasks/`. Open the next pending phase when needed, execute or supervise pending tasks, and close the phase when its tasks are complete or blocked. To keep the long supervision loop cheap, the executor never does heavy work in its own context: task generation is pushed to a one-shot planner subagent, and exit-criteria test/build runs to a verifier subagent — each returns only a compact summary, so the executor's context (re-read from cache every turn) stays lean.
 
 **`task-implement`**
 

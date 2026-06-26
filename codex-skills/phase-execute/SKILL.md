@@ -18,6 +18,8 @@ If none exists, find the lowest-numbered `status: pending` phase and open it. Wh
 - set `opened: <YYYY-MM-DD>`
 - generate task files if the phase does not have any yet
 
+Generating tasks is context-heavy (read `project.md`, the spec, and the prior phase's outcomes, then write N files). If the user has enabled delegation, push this into a one-shot planner subagent that writes the task files and returns only a one-line summary, so the main thread stays lean for the execution loop. Otherwise generate them in-thread, but keep only the resulting files in mind — not the full breakdown reasoning.
+
 Always read `.tasks/project.md` before continuing.
 
 ### Step 2: Load phase context
@@ -63,6 +65,7 @@ If a task is blocked, record that in the phase-level reasoning but continue with
 ### Step 6: Close the phase
 
 When all tasks are `done` or `blocked`:
+- if the exit criteria need a full test-suite or build run, run it but keep only a compact verdict (PASS, or FAIL + failing-test names) — never retain full logs or stack traces in the thread; if delegation is enabled, run it in a verifier subagent that returns just that verdict
 - update `phase.md` to `status: closed`
 - set `closed: <YYYY-MM-DD>`
 - update `.tasks/project.md` to check off the phase
@@ -86,3 +89,4 @@ Return a concise summary:
 - Prefer serial execution unless the user explicitly requests parallel delegation.
 - Do not assume subagent tools or model-routing features are available.
 - Generate tasks for a newly opened phase only when needed.
+- Keep the thread lean: task generation and full-suite/build runs are context-heavy — delegate them to a subagent when delegation is enabled, and never retain full test/build logs (keep only pass/fail + failing names).
