@@ -1,0 +1,32 @@
+{
+  "name": "dx0ne-agent-skills",
+  "interface": {
+    "displayName": "dx0ne's agent skills"
+  },
+  "plugins": [
+    {
+      "name": "agentflow",
+      "source": {
+        "source": "local",
+        "path": "./codex-skills/agentflow"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "utils",
+      "source": {
+        "source": "local",
+        "path": "./codex-skills/utils"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

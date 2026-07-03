@@ -4,8 +4,8 @@ Agent skills for Claude Code and Codex.
 
 This repo currently ships the same core workflow in two packaging styles:
 
-- `skills/`: Claude-compatible plugin layout
-- `codex-skills/`: Codex-native standalone skills
+- `skills/`: Claude-compatible plugin layout, registered via `.claude-plugin/marketplace.json`
+- `codex-skills/`: Codex-native plugin layout, registered via `.agents/plugins/marketplace.json`
 
 ## Included Skills
 
@@ -65,7 +65,7 @@ Stage, commit, and push the current branch without extra confirmation prompts.
 The Claude and Codex versions are intentionally similar, but they are not identical:
 
 - The Claude skills live under `skills/` and are packaged through `.claude-plugin/marketplace.json`.
-- The Codex skills live under `codex-skills/` as standalone skill folders.
+- The Codex skills live under `codex-skills/<plugin>/skills/` and are packaged through `.agents/plugins/marketplace.json`, one `.codex-plugin/plugin.json` per plugin (`agentflow`, `utils`).
 - The Codex `phase-execute` port defaults to serial execution and only delegates to subagents when the user explicitly wants delegation or parallel agent work.
 - The Codex ports remove Claude-specific model routing and Claude-specific co-author behavior.
 
@@ -91,7 +91,17 @@ npx skills add dx0ne/agent-skills
 
 ### Codex
 
-Codex discovers skills from repository, user, admin, and system locations. For project-specific skills, place skill folders under `.agents/skills` in the repository or a parent folder of the directory where you launch Codex. Codex scans `.agents/skills` from the current working directory up to the repository root. See the [OpenAI Codex skills docs](https://developers.openai.com/codex/skills).
+Install from the plugin marketplace ([Codex plugins docs](https://developers.openai.com/codex/plugins)):
+
+```text
+codex plugin marketplace add dx0ne/agent-skills
+```
+
+Then install `agentflow` and/or `utils` from the `/plugins` directory (or `@`-reference them directly once installed). This registers this repo's `.agents/plugins/marketplace.json`, which points at the `agentflow` and `utils` plugin folders under `codex-skills/`.
+
+#### Manual / flat-folder install
+
+Codex also discovers plain skill folders from repository, user, admin, and system locations, independent of the plugin system. For project-specific skills, place skill folders under `.agents/skills` in the repository or a parent folder of the directory where you launch Codex. Codex scans `.agents/skills` from the current working directory up to the repository root. See the [OpenAI Codex skills docs](https://developers.openai.com/codex/skills).
 
 Use the repository scope when the workflow should live with a project and be shared by everyone working in that repo:
 
@@ -117,7 +127,7 @@ Use the user scope when the skills should be available across all repos for your
   yolo/
 ```
 
-This repository stores Codex-native skill folders in `codex-skills/`. Each installed Codex skill folder should contain:
+This repository stores Codex-native skill folders under `codex-skills/<plugin>/skills/` (`codex-skills/agentflow/skills/` and `codex-skills/utils/skills/`). Each installed Codex skill folder should contain:
 
 - `SKILL.md`
 - `agents/openai.yaml`
@@ -150,48 +160,48 @@ You can also copy selected skills manually.
 
 ```bash
 mkdir -p .agents/skills
-cp -R codex-skills/project-specify .agents/skills/
-cp -R codex-skills/project-orchestrate .agents/skills/
-cp -R codex-skills/phase-execute .agents/skills/
-cp -R codex-skills/task-implement .agents/skills/
-cp -R codex-skills/project-status .agents/skills/
-cp -R codex-skills/yolo .agents/skills/
+cp -R codex-skills/agentflow/skills/project-specify .agents/skills/
+cp -R codex-skills/agentflow/skills/project-orchestrate .agents/skills/
+cp -R codex-skills/agentflow/skills/phase-execute .agents/skills/
+cp -R codex-skills/agentflow/skills/task-implement .agents/skills/
+cp -R codex-skills/agentflow/skills/project-status .agents/skills/
+cp -R codex-skills/utils/skills/yolo .agents/skills/
 ```
 
 **Project install, Windows PowerShell**
 
 ```powershell
 New-Item -ItemType Directory -Force ".\.agents\skills" | Out-Null
-Copy-Item -Recurse -Force ".\codex-skills\project-specify" ".\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\project-orchestrate" ".\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\phase-execute" ".\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\task-implement" ".\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\project-status" ".\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\yolo" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-specify" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-orchestrate" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\phase-execute" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\task-implement" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-status" ".\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\utils\skills\yolo" ".\.agents\skills\"
 ```
 
 **User install, macOS / Linux**
 
 ```bash
 mkdir -p ~/.agents/skills
-cp -R codex-skills/project-specify ~/.agents/skills/
-cp -R codex-skills/project-orchestrate ~/.agents/skills/
-cp -R codex-skills/phase-execute ~/.agents/skills/
-cp -R codex-skills/task-implement ~/.agents/skills/
-cp -R codex-skills/project-status ~/.agents/skills/
-cp -R codex-skills/yolo ~/.agents/skills/
+cp -R codex-skills/agentflow/skills/project-specify ~/.agents/skills/
+cp -R codex-skills/agentflow/skills/project-orchestrate ~/.agents/skills/
+cp -R codex-skills/agentflow/skills/phase-execute ~/.agents/skills/
+cp -R codex-skills/agentflow/skills/task-implement ~/.agents/skills/
+cp -R codex-skills/agentflow/skills/project-status ~/.agents/skills/
+cp -R codex-skills/utils/skills/yolo ~/.agents/skills/
 ```
 
 **User install, Windows PowerShell**
 
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
-Copy-Item -Recurse -Force ".\codex-skills\project-specify" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\project-orchestrate" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\phase-execute" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\task-implement" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\project-status" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\yolo" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-specify" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-orchestrate" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\phase-execute" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\task-implement" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-status" "$HOME\.agents\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\utils\skills\yolo" "$HOME\.agents\skills\"
 ```
 
 If multiple installed skills share the same `name`, Codex does not merge them. Keep repo-scoped skill names distinct from user-scoped variants unless you intentionally want both to appear in skill selectors.

@@ -4,12 +4,12 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source_root="$repo_root/codex-skills"
 skills=(
-  "project-specify"
-  "project-orchestrate"
-  "phase-execute"
-  "task-implement"
-  "project-status"
-  "yolo"
+  "agentflow/skills/project-specify"
+  "agentflow/skills/project-orchestrate"
+  "agentflow/skills/phase-execute"
+  "agentflow/skills/task-implement"
+  "agentflow/skills/project-status"
+  "utils/skills/yolo"
 )
 
 usage() {
@@ -72,8 +72,9 @@ fi
 mkdir -p "$target_root"
 
 for skill in "${skills[@]}"; do
+  skill_name="$(basename "$skill")"
   source_dir="$source_root/$skill"
-  target_dir="$target_root/$skill"
+  target_dir="$target_root/$skill_name"
 
   if [[ ! -d "$source_dir" ]]; then
     echo "Missing skill directory: $source_dir" >&2
@@ -82,7 +83,7 @@ for skill in "${skills[@]}"; do
 
   rm -rf "$target_dir"
   cp -R "$source_dir" "$target_dir"
-  echo "Installed $skill -> $target_dir"
+  echo "Installed $skill_name -> $target_dir"
 done
 
 echo "Codex skills installed to $target_root"

@@ -11,12 +11,12 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sourceRoot = Join-Path $repoRoot "codex-skills"
 $skills = @(
-    "project-specify",
-    "project-orchestrate",
-    "phase-execute",
-    "task-implement",
-    "project-status",
-    "yolo"
+    "agentflow/skills/project-specify",
+    "agentflow/skills/project-orchestrate",
+    "agentflow/skills/phase-execute",
+    "agentflow/skills/task-implement",
+    "agentflow/skills/project-status",
+    "utils/skills/yolo"
 )
 
 if (-not (Test-Path $sourceRoot)) {
@@ -44,8 +44,9 @@ if ($target) {
 New-Item -ItemType Directory -Force $resolvedTargetRoot | Out-Null
 
 foreach ($skill in $skills) {
+    $skillName = Split-Path -Leaf $skill
     $source = Join-Path $sourceRoot $skill
-    $target = Join-Path $resolvedTargetRoot $skill
+    $target = Join-Path $resolvedTargetRoot $skillName
 
     if (-not (Test-Path $source)) {
         throw "Missing skill directory: $source"
@@ -56,7 +57,7 @@ foreach ($skill in $skills) {
     }
 
     Copy-Item -Recurse -Force $source $target
-    Write-Host "Installed $skill -> $target"
+    Write-Host "Installed $skillName -> $target"
 }
 
 Write-Host "Codex skills installed to $resolvedTargetRoot"
