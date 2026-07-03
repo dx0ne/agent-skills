@@ -117,8 +117,8 @@ For each task file with `status: pending`, dispatch a subagent:
 | complexity | model |
 |-----------|-------|
 | low | claude-haiku-4-5-20251001 |
-| medium | claude-sonnet-4-6 |
-| high | claude-opus-4-6 |
+| medium | claude-sonnet-5 |
+| high | claude-opus-4-8 |
 
 **Subagent prompt template:**
 ```
@@ -158,7 +158,7 @@ The executor never accepts a returned DONE on its own. It dispatches an **indepe
    | diff | model |
    |------|-------|
    | small, mechanical | claude-haiku-4-5-20251001 |
-   | multi-file or subtle logic | claude-sonnet-4-6 |
+   | multi-file or subtle logic | claude-sonnet-5 |
 
    Don't default the reviewer to the implementer's model — that silently doubles cost for no gain.
 
