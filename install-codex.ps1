@@ -38,7 +38,7 @@ if ($target) {
     $resolvedProjectPath = (Resolve-Path -LiteralPath $repo).Path
     $resolvedTargetRoot = Join-Path $resolvedProjectPath ".agents\skills"
 } else {
-    $resolvedTargetRoot = Join-Path $HOME ".agents\skills"
+    $resolvedTargetRoot = Join-Path $HOME ".codex\skills"
 }
 
 New-Item -ItemType Directory -Force $resolvedTargetRoot | Out-Null

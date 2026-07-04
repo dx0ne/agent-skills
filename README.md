@@ -119,7 +119,7 @@ your-project/
 Use the user scope when the skills should be available across all repos for your own Codex setup:
 
 ```text
-~/.agents/skills/
+~/.codex/skills/
   project-orchestrate/
   phase-execute/
   task-implement/
@@ -183,25 +183,25 @@ Copy-Item -Recurse -Force ".\codex-skills\utils\skills\yolo" ".\.agents\skills\"
 **User install, macOS / Linux**
 
 ```bash
-mkdir -p ~/.agents/skills
-cp -R codex-skills/agentflow/skills/project-specify ~/.agents/skills/
-cp -R codex-skills/agentflow/skills/project-orchestrate ~/.agents/skills/
-cp -R codex-skills/agentflow/skills/phase-execute ~/.agents/skills/
-cp -R codex-skills/agentflow/skills/task-implement ~/.agents/skills/
-cp -R codex-skills/agentflow/skills/project-status ~/.agents/skills/
-cp -R codex-skills/utils/skills/yolo ~/.agents/skills/
+mkdir -p ~/.codex/skills
+cp -R codex-skills/agentflow/skills/project-specify ~/.codex/skills/
+cp -R codex-skills/agentflow/skills/project-orchestrate ~/.codex/skills/
+cp -R codex-skills/agentflow/skills/phase-execute ~/.codex/skills/
+cp -R codex-skills/agentflow/skills/task-implement ~/.codex/skills/
+cp -R codex-skills/agentflow/skills/project-status ~/.codex/skills/
+cp -R codex-skills/utils/skills/yolo ~/.codex/skills/
 ```
 
 **User install, Windows PowerShell**
 
 ```powershell
-New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
-Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-specify" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-orchestrate" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\phase-execute" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\task-implement" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-status" "$HOME\.agents\skills\"
-Copy-Item -Recurse -Force ".\codex-skills\utils\skills\yolo" "$HOME\.agents\skills\"
+New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-specify" "$HOME\.codex\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-orchestrate" "$HOME\.codex\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\phase-execute" "$HOME\.codex\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\task-implement" "$HOME\.codex\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\agentflow\skills\project-status" "$HOME\.codex\skills\"
+Copy-Item -Recurse -Force ".\codex-skills\utils\skills\yolo" "$HOME\.codex\skills\"
 ```
 
 If multiple installed skills share the same `name`, Codex does not merge them. Keep repo-scoped skill names distinct from user-scoped variants unless you intentionally want both to appear in skill selectors.

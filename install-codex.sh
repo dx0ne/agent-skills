@@ -18,7 +18,7 @@ Usage: install-codex.sh [--user | --repo [PROJECT_DIR] | --target SKILLS_DIR]
 
 Options:
   --user                 Install to the current Codex user skills directory:
-                         $HOME/.agents/skills. This is the default.
+                         $HOME/.codex/skills. This is the default.
   --repo [PROJECT_DIR]   Install to PROJECT_DIR/.agents/skills, or to the
                          current working directory if PROJECT_DIR is omitted.
   --target SKILLS_DIR    Install directly into an explicit skills directory.
@@ -26,12 +26,12 @@ Options:
 EOF
 }
 
-target_root="${HOME}/.agents/skills"
+target_root="${HOME}/.codex/skills"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --user)
-      target_root="${HOME}/.agents/skills"
+      target_root="${HOME}/.codex/skills"
       shift
       ;;
     --repo)
