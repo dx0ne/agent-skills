@@ -52,6 +52,8 @@ Understand:
 - `## Context` — background, relevant files
 - `## Acceptance Criteria` — what done looks like
 
+**The task file defines the scope, and the scope is the deliverable.** Deliver what it asks, at the scope intended. Make routine judgment calls yourself. If the task looks mistaken, or you spot a better approach, or you notice adjacent work that wants doing, write it in one line under `## Notes` and continue with the task as specified — don't quietly narrow, widen, or transform it. Finish the whole task, and stop short of work clearly beyond it.
+
 ### Step 2 — Set In-Progress
 
 Update task file frontmatter: `status: in-progress`
@@ -82,11 +84,11 @@ If you realize the task is blocked (missing dependency, ambiguous requirement, e
 
 ### Step 4 — Verify
 
-Before marking done, verify against reality — run the relevant tests, checks, or commands and confirm the actual output rather than assuming. Evidence before claims.
-
-Check each acceptance criterion in the task file:
+Run the tests and checks relevant to this task and read the actual output. Then check off each acceptance criterion in the task file:
 - Update `- [ ]` to `- [x]` for each criterion met
 - If a criterion cannot be met, treat as blocked
+
+That single pass is enough — don't re-verify work you've already confirmed. An independent reviewer checks this task's diff after you return; your job is to get it right once, not to audit yourself twice.
 
 ### Step 5 — Fill Notes & Close
 
@@ -95,6 +97,8 @@ Update the `## Notes` section with:
 - Files created or modified (with paths)
 - Key decisions made and why
 - Any concerns or follow-up items
+
+**Keep Notes tight — target 15 lines or fewer.** Cover the substance and stop; no filler sections, no redundant restatement of the Goal or Acceptance Criteria, no narration of your process. The executor and every future planner re-read this file, so padding here is paid for many times over.
 
 Update frontmatter: `status: done`
 
@@ -110,10 +114,15 @@ Return one of these to the calling executor:
 | `DONE_WITH_CONCERNS` | Done but with issues noted in Notes (tech debt, assumptions, risks) |
 | `BLOCKED` | Could not complete — reason in Notes |
 
+**Return one line: the status token plus at most a short clause.** Everything else belongs in `## Notes`. The executor is running a long loop and re-reads whatever you hand it on every remaining turn.
+
 ## Key Rules
 
 - **Never skip TDD** — tests before implementation, always
 - **Never guess past a blocker** — document and return BLOCKED
-- **Notes are required** — the executor and future agents depend on them
+- **Stay inside the task's scope** — note adjacent work, don't do it
+- **Don't delegate** — you are already a dispatched subagent, so implement this task yourself. Only spawn a subagent for a genuinely large, independent investigation you can't do in a handful of tool calls — never to write the code for you, and never to verify or double-check your own work
+- **Verify once, not repeatedly** — one honest pass over the acceptance criteria; an independent reviewer gates the result afterwards
+- **Notes are required, and short** — the executor and future agents depend on them, and re-read them every turn
 - **Commit every state change** — in-progress, done, blocked
 - **Read the task file fresh** — don't rely on the prompt summary; the file is the spec
