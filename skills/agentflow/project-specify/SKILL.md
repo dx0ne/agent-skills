@@ -87,6 +87,8 @@ Propose **2–3 distinct approaches** with honest trade-offs (effort, risk, flex
 
 Present the design as labeled sections, scaled to the project's complexity (e.g. Architecture, Data Model, Phases, Risks). **Get explicit approval after each section** rather than dumping the whole design and asking once. Revise on feedback and re-present. Do not move to writing the spec until the design as a whole is approved.
 
+Keep each section short enough to review in one sitting — a few tight paragraphs or a bullet list, not an essay. Spend the words on the decision and its consequences; keep caveats and disclaimers brief. A section the user skims because it's long has not actually been approved.
+
 ### Step 5 — Detect Mode & Write the Spec
 
 **Mode is inferred from state:**
@@ -153,6 +155,7 @@ Before showing the user, review your own spec for:
 - **Internal consistency** — `kind` matches the inferred mode; `title`/`repo` present iff bootstrap; phase goals align with the prose design.
 - **Scope** — phases cover the agreed scope and nothing beyond it (respect stated non-goals).
 - **Ambiguity** — each phase goal is concrete enough for `project-orchestrate` to derive tasks.
+- **Length** — the prose section covers the substance without padding: no filler sections, no redundant summary of the frontmatter, no boilerplate. The spec is read by every downstream planner subagent, so length here is paid for repeatedly.
 
 Fix anything that fails before proceeding.
 
