@@ -21,6 +21,8 @@ Understand:
 
 If the task depends on unfinished work, do not start implementation. Mark or keep it blocked and document why.
 
+**The task file defines the scope, and the scope is the deliverable.** Deliver what it asks, at the scope intended. Make routine judgment calls yourself. If the task looks mistaken, or a better approach exists, or you notice adjacent work that wants doing, write it in one line under `## Notes` and continue with the task as specified — do not quietly narrow, widen, or transform it. Finish the whole task, and stop short of work clearly beyond it.
+
 ### Step 2: Mark work in progress
 
 If the task is not already `in-progress`, update the frontmatter to:
@@ -62,6 +64,8 @@ Before marking the task done:
 
 If any required criterion cannot be met, do not mark the task done.
 
+One honest pass is enough. Do not re-run checks you have already read the output of, and do not spawn a second agent to double-check your own work.
+
 ### Step 5: Fill notes and close
 
 Update `## Notes` with:
@@ -69,6 +73,8 @@ Update `## Notes` with:
 - files created or modified
 - key decisions
 - residual risks or follow-up work
+
+**Keep Notes tight — target 15 lines or fewer.** Cover the substance and stop; no filler sections, no restating the Goal or Acceptance Criteria, no narration of your process. The phase executor and every later session re-read this file.
 
 Then set one of:
 - `status: done` when all criteria are met
@@ -83,11 +89,16 @@ Return one of:
 
 Use `DONE_WITH_CONCERNS` only when the acceptance criteria are met but meaningful risks or deferred work remain and are documented in `## Notes`.
 
+Return the status token plus at most a short clause. Everything else belongs in `## Notes`.
+
 ## Rules
 
 - Never skip TDD; write the failing test before the implementation.
 - Read the task file fresh; do not rely on prompt summaries.
+- Stay inside the task's scope; note adjacent work instead of doing it.
+- Do not delegate this task onward, and do not use a subagent to verify or double-check your own work. Implement it yourself.
+- Verify once, honestly — a single pass over the acceptance criteria, not a repeated audit.
 - Keep status transitions accurate.
 - Never mark criteria complete without verification.
 - Never hide blockers inside a vague note.
-- Notes are required because future sessions depend on them.
+- Notes are required because future sessions depend on them — and short, because they are re-read.
