@@ -7,7 +7,7 @@ description: Use when starting a new session to execute a project phase. Trigger
 
 Supervises execution of a single project phase. Finds the current open phase, dispatches a subagent per task (each invoking `task-implement`), monitors results, and closes the phase when done. The executor never implements — it only supervises.
 
-**The executor's context is a scarce resource.** It runs a long, many-turn loop (one dispatch + one or more review rounds per task), and every turn re-reads the whole resident context from cache. So the executor must keep that context lean: it never does heavy reasoning itself (task generation), never reads large outputs into its own context (full test logs, build output, big diffs), and never implements. All of that is pushed into short-lived subagents that return compact summaries. Bloat in the executor multiplies across every remaining turn of the loop.
+**The executor's context is expensive, and that is the reason to keep it lean.** It runs a long, many-turn loop (one dispatch + one or more review rounds per task), and every turn pays cache-read on its whole resident context. This is a *cost* argument, not a capability one — current models hold instruction-following and reasoning quality across a very long window, so the concern is tokens billed per turn, not degradation. So the executor never does heavy reasoning itself (task generation), never reads large outputs into its own context (full test logs, build output, big diffs), and never implements. All of that is pushed into short-lived subagents that return compact summaries. Bloat in the executor multiplies across every remaining turn of the loop.
 
 ## When to Use
 
@@ -97,7 +97,9 @@ blocked-by: ~        # task-NN of any task this depends on, or ~
 
 Then update phase.md's ## Tasks checklist to list the files you created. Keep tasks small and independently testable; set blocked-by honestly so the executor can order them.
 
-Return ONE line only: "Generated M tasks for phase N: task-01-x, task-02-y, ...". Do not return your reasoning.
+Generate tasks for the phase goal as written — do not widen the phase's scope or add tasks for work a later phase owns.
+
+Return ONE line only: "Generated M tasks for phase N: task-01-x, task-02-y, ...". No explanation, no preamble, no summary of how you decided.
 ```
 
 ### Step 2 — Read Phase Context
@@ -113,12 +115,14 @@ Read `.tasks/project.md` for overall project context.
 
 For each task file with `status: pending`, dispatch a subagent:
 
-**Model selection by complexity:**
-| complexity | model |
-|-----------|-------|
-| low | claude-haiku-4-5-20251001 |
-| medium | claude-sonnet-5 |
-| high | claude-opus-4-8 |
+**Dispatch tuning by complexity:**
+| complexity | model | effort (where the harness exposes it) |
+|-----------|-------|----------------------------------------|
+| low | claude-haiku-4-5-20251001 | low |
+| medium | claude-sonnet-5 | medium |
+| high | claude-opus-5 | xhigh |
+
+**Reach for effort before reaching for a smaller model.** Low and medium effort hold quality at a fraction of the tokens and latency, so effort is the primary cost lever; a model downgrade trades away capability instead of just thinking tokens. Where the dispatch mechanism has no per-agent effort parameter (Claude Code's `Agent` tool exposes `model` but not `effort`; `Workflow`'s `agent()` exposes both), fall back to the model column alone and leave effort at the session default.
 
 **Subagent prompt template:**
 ```
@@ -134,7 +138,11 @@ Invoke the `task-implement` skill to execute this task. Read the task file first
 
 Implement test-first, as `task-implement` requires. Your returned status will be checked against the task file — the acceptance criteria and the tests backing them.
 
-When complete, return one of:
+Deliver what the task file asks, at the scope intended. Make routine judgment calls yourself. If the task looks mistaken or a better approach exists, note it in one line under ## Notes and continue as asked — do not quietly narrow, widen, or transform it. Finish the whole task, and stop short of work clearly beyond it.
+
+Implement the task yourself — do not delegate it onward, and do not spawn subagents to verify or double-check your own work.
+
+When complete, return ONE line: a status token plus at most a short clause. No summary of the work — that belongs in the task file's ## Notes.
 - DONE — task complete, acceptance criteria met
 - DONE_WITH_CONCERNS — done but with issues noted in task Notes
 - BLOCKED — could not complete, reason documented in task Notes
@@ -154,13 +162,15 @@ The executor never accepts a returned DONE on its own. It dispatches an **indepe
 
 3. **Dispatch the reviewer subagent** with the template below. It gets the task file (its acceptance criteria are the spec) and the diff.
 
-   **Reviewer model — use a smaller/cheaper model than the implementer.** Review is mostly judgment over a bounded diff, so scale down:
-   | diff | model |
-   |------|-------|
-   | small, mechanical | claude-haiku-4-5-20251001 |
-   | multi-file or subtle logic | claude-sonnet-5 |
+   **Reviewer dispatch — scale down from the implementer.** Review is mostly judgment over a bounded diff, and review accuracy holds up well at lower effort, so a cheap fast pass per task is the right shape:
+   | diff | model | effort |
+   |------|-------|--------|
+   | small, mechanical | claude-haiku-4-5-20251001 | low |
+   | multi-file or subtle logic | claude-sonnet-5 | medium |
 
-   Don't default the reviewer to the implementer's model — that silently doubles cost for no gain.
+   Don't default the reviewer to the implementer's model — that silently doubles cost for no gain. The thorough pass happens later, at the phase's exit-criteria gate (Step 5).
+
+   **Ask the reviewer for everything and filter here.** Never instruct it to "only report high-severity issues" or "be conservative" — it will comply literally and under-report. Severity filtering is the executor's job in step 4 below, not the reviewer's.
 
 4. **Gate on the verdict:**
    - **APPROVED** (spec ✅, no Critical/Important issues): mark the task done, commit `chore(task-NN): done — <title>`, continue.
@@ -179,10 +189,14 @@ Diff to review: <commit range or diff file path>
 
 The task file's ## Acceptance Criteria are the spec. Review ONLY the diff against them.
 
+Report every issue you find at every severity — the executor filters, you do not. Do not withhold Minor findings.
+
 Report:
 - Spec: ✅ if every acceptance criterion is met and nothing beyond the task was built; ❌ with specifics otherwise.
 - Quality: issues as Critical / Important / Minor. Flag missing or fake tests — the task required test-first development, so behavior must be backed by real tests that would fail without the change.
 - Verdict: APPROVED (spec ✅, no Critical/Important) or CHANGES_REQUESTED with the findings list.
+
+Keep the whole report under ~15 lines: one line per finding, each naming file:line and the problem. No code blocks, no restating the diff, no preamble.
 
 Do not implement fixes. Do not soften or pre-rate severity to avoid a fix loop. Report exactly what you find.
 ```
@@ -221,13 +235,26 @@ Output to the human:
 Or if project is done:
 > Project complete. All phases closed. See `.tasks/project.md` for summary.
 
+## Communicating During the Loop
+
+The supervision loop is long and mostly mechanical, so narrate it thinly:
+
+- **One sentence before the first dispatch**, naming the phase and task count.
+- **During the loop, one line per task transition** — dispatched / approved / fix round N / blocked. Nothing else unless you change direction (reordering tasks, reopening work, hitting a systemic problem), in which case say why in one line.
+- **Never echo a subagent's return into your own prose.** The task file and the commit log already hold it.
+- **At phase close, lead with the outcome** — done/blocked counts first, supporting detail after.
+
+Written files get the same discipline: `phase.md` and `project.md` edits are bookkeeping, not prose. Match their length to what the next session actually needs to read.
+
 ## Key Rules
 
 - **Executor never implements** — all implementation work goes to subagents
 - **Executor never generates tasks inline** — task generation is a one-shot planner subagent (Step 1); the executor reads only its one-line summary, never its reasoning
 - **Executor never runs the suite or build in its own context** — exit-criteria checks go to a verifier subagent that returns a compact PASS/FAIL (Step 5); full logs never enter the supervisor session
 - **Keep the executor's context lean** — it runs a many-turn loop and pays cache-read on its whole context every turn; push heavy reading/reasoning into subagents that return summaries
-- **Review is an independent gate** — a separate, cheaper reviewer subagent (never the implementer, never the executor reading checkmarks) must approve each task before it closes; loop fixes until approved
+- **Review is an independent gate** — a separate, cheaper reviewer subagent (never the implementer, never the executor reading checkmarks) must approve each task before it closes; loop fixes until approved. This is a writer-verifier split across two agents, not an agent re-checking itself: implementers must never be told to self-verify or to spawn their own verifier
+- **Effort before model downgrade** — when trimming cost, lower effort first and only then step down a model tier; cap subagent count structurally (one implementer + one reviewer per task) rather than leaving it to judgment
+- **Every subagent prompt states its return shape and length** — planner one line, implementer one line, reviewer ~15 lines, verifier one verdict; an uncapped return lands in the executor's context and is re-read every remaining turn
 - **Phases are the archive boundary** — never read or modify closed phases
 - **Source of truth is `.tasks/`** — always read current file state, don't rely on memory
 - **Commit every state change** — phase open, task done/blocked, phase close
