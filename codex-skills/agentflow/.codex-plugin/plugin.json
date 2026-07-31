@@ -1,6 +1,6 @@
 {
   "name": "agentflow",
-  "version": "1.0.0",
+  "version": "1.0.0+codex.20260731161042",
   "description": "Four-tier project execution pipeline: design -> plan -> execute -> implement; plus read-only status",
   "skills": "./skills/"
 }
