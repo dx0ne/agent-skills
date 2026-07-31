@@ -116,6 +116,20 @@ npx skills add dx0ne/agent-skills
 codex plugin marketplace add dx0ne/agent-skills
 ```
 
+## Codex cachebuster (before every push that touches `codex-skills/`)
+
+Codex caches installed plugins by version. Any change under `codex-skills/<plugin>/`
+must be accompanied by a version bump in that plugin's `.codex-plugin/plugin.json`,
+or Codex will keep serving the stale cached copy. Run before committing:
+
+```powershell
+python "$env:USERPROFILE\.codex\skills\.system\plugin-creator\scripts\update_plugin_cachebuster.py" ".\codex-skills\agentflow"
+```
+
+It rewrites `version` to `<base>+codex.<UTC timestamp>` (e.g. `1.0.0+codex.20260731161042`),
+replacing any existing `+codex.*` suffix. Pass the matching plugin path for `utils`.
+Never edit files under `~/.codex/plugins/cache` — they are overwritten on refresh.
+
 ## Validation
 
 After changes, verify:
