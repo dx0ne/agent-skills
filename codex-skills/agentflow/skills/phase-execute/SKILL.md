@@ -18,7 +18,7 @@ If none exists, find the lowest-numbered `status: pending` phase and open it. Wh
 - set `opened: <YYYY-MM-DD>`
 - generate task files if the phase does not have any yet
 
-Generating tasks is context-heavy (read `project.md`, the spec, and the prior phase's outcomes, then write N files). If the user has enabled delegation, push this into a one-shot planner subagent that writes the task files and returns only a one-line summary — no explanation, no preamble — so the main thread stays lean for the execution loop. Otherwise generate them in-thread, but keep only the resulting files in mind, not the full breakdown reasoning.
+Generating tasks is context-heavy (read `project.md`, the spec, and the prior phase's outcomes, then write N files). Every numbered item in the phase's `## Carry from phase <N-1>` section must become (or be folded into) a task that names it; `## Open follow-ups` items become tasks only when they fall inside the phase goal. If the user has enabled delegation, push this into a one-shot planner subagent that writes the task files and returns only a one-line summary — no explanation, no preamble — so the main thread stays lean for the execution loop. Otherwise generate them in-thread, but keep only the resulting files in mind, not the full breakdown reasoning.
 
 Generate tasks for the phase goal as written. Do not widen the phase's scope or add tasks for work a later phase owns.
 
@@ -73,6 +73,7 @@ If a task is blocked, record that in the phase-level reasoning but continue with
 
 When all tasks are `done` or `blocked`:
 - if the exit criteria need a full test-suite or build run, run it but keep only a compact verdict (PASS, or FAIL + failing-test names) — never retain full logs or stack traces in the thread; if delegation is enabled, run it in a verifier subagent that returns just that verdict
+- write the carry-forward into the next phase's `phase.md` (skip for the final phase): a `## Carry from phase N` section (numbered process/tooling fixes the next phase must make, each becomes a task when it is planned) and a `## Open follow-ups from phase N` section (recheck-later items, decisions waiting on the user, things not to touch). Source them from task `## Notes`, recorded Minor findings and blocked reasons; write "none" rather than omitting a heading. If the next phase does not exist yet, put both under `## Carry-forward` in this phase's `phase.md`
 - update `phase.md` to `status: closed`
 - set `closed: <YYYY-MM-DD>`
 - update `.tasks/project.md` to check off the phase

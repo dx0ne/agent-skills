@@ -81,6 +81,8 @@ Spec:         <absolute path to the spec under .tasks/specs/ that produced this 
 
 Read project.md, the phase.md goal + exit criteria, and the spec. Also read the ## Notes of the most recent CLOSED phase's task files — later phases must build on what earlier phases actually learned.
 
+If phase.md has a "## Carry from phase <N-1>" section, every numbered item in it is required work: turn each into a task (or fold it into one) and name the carry item it covers in that task's title or Context. "## Open follow-ups from phase <N-1>" items become tasks only when they fall inside this phase's goal; otherwise leave them listed.
+
 Write one task file per unit of work into .tasks/phase-N/, named task-NN-<name>.md, using this exact format:
 ---
 id: task-<NN>
@@ -216,11 +218,16 @@ When all tasks are `done` or `blocked`:
    Return ONE compact verdict: "PASS", or "FAIL: <failing test/check names>". Do NOT paste full logs or stack traces.
    ```
 
-1. Update `phase.md`: `status: closed`, `closed: <date>`
-2. Update `project.md` task checklist for this phase: `- [x] Phase N: <title>`
-3. Increment `current-phase` in `project.md`
-4. Commit: `chore(phase-N): closed`
-5. Push
+1. **Write the carry-forward into the next phase's `phase.md`** (skip only if this is the final phase). Lessons and follow-ups scattered across task `## Notes` are invisible to the next session's planner, so gather them into two sections placed after the next phase's goal:
+   - `## Carry from phase N` — numbered process/tooling fixes the next phase must make before or while it runs (each becomes a task when that phase is planned). One or two lines each, with the evidence that motivated it.
+   - `## Open follow-ups from phase N` — loose ends that are not setup work: items to recheck later, unmerged candidates, decisions still waiting on the user, sessions or branches not to touch.
+
+   Source them from this phase's task `## Notes`, reviewer Minor findings recorded there, and BLOCKED reasons. Write "none" under a heading rather than omitting it, so the next session knows it was considered. If the next phase does not exist yet, put both sections under a `## Carry-forward` heading in this phase's `phase.md` instead, for `project-orchestrate` to pick up.
+2. Update `phase.md`: `status: closed`, `closed: <date>`
+3. Update `project.md` task checklist for this phase: `- [x] Phase N: <title>`
+4. Increment `current-phase` in `project.md`
+5. Commit (the next phase's `phase.md` goes in the same commit): `chore(phase-N): closed`
+6. Push
 
 If this was the final phase: set `project.md` `status: done`, commit, push.
 
@@ -230,6 +237,7 @@ Output to the human:
 
 > Phase N complete. X tasks done, Y blocked.
 > [If blocked tasks]: Review `.tasks/phase-N/` for blocked task details.
+> Carry-forward: K items + L open follow-ups written to `.tasks/phase-N+1/phase.md`.
 > Start a new session and invoke `phase-execute` for Phase N+1.
 
 Or if project is done:
