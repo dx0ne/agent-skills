@@ -74,6 +74,8 @@ If a phase has `status: open`, glob its `task-*.md` files. For each task, read f
   - Else if no open phase but pending phases remain → "Invoke `phase-execute` to open Phase N."
   - Else if all phases closed → "Project complete."
 
+**Carry-forward:** in the open phase's `phase.md` (or, with no open phase, the next pending one), count the numbered items under `## Carry from phase <N-1>` and the items under `## Open follow-ups from phase <N-1>`. If every phase is closed, count them under the last phase's `## Carry-forward` heading instead. Skip "none" entries.
+
 ### Step 4 — Detect unconsumed specs
 
 Glob `.tasks/specs/*.md`. A spec is **consumed** if its relative path (e.g. `specs/2026-06-17-auth.md`) appears anywhere in the `## Specs` log you captured in Step 1. Log lines look like:
@@ -121,6 +123,9 @@ Status: <in-progress|done> · Phase <current>/<total> · Branch: <branch>
 ## Next Action
 Resume `task-04-<name>` (in-progress) — <title>
 
+## Carry-forward
+<K> carry items · <L> open follow-ups from phase <N-1> (see `.tasks/phase-<N>/phase.md`)
+
 ## Unconsumed Specs
 - specs/2026-06-17-foo.md
 - specs/2026-07-02-bar.md
@@ -133,6 +138,8 @@ Resume `task-04-<name>` (in-progress) — <title>
 ```
 
 Use `[x]` for closed phases, `[>]` for the open phase, `[ ]` for pending. If there are no blockers, write "No blockers." If the project is complete, omit Blockers and Next Action.
+
+Include the **Carry-forward** section only when at least one carry item or open follow-up was counted in Step 3. Report counts and the file path only; do not copy the items into the report.
 
 Include the **Unconsumed Specs** section only when there is at least one unconsumed spec. List each by its relative path within `.tasks/`. If deprecated root files (`brief.md` or `extension.md`) are also present, append a note: "Deprecated root file(s) also present: `brief.md` / `extension.md` — migrate to `.tasks/specs/`."
 

@@ -32,6 +32,7 @@ digraph execute {
     "Dispatch fix subagent → task-implement" [shape=box];
     "Mark task done" [shape=box];
     "All tasks done/blocked?" [shape=diamond];
+    "Write carry-forward" [shape=box];
     "Close phase + update project.md" [shape=box];
     "Final phase?" [shape=diamond];
     "Mark project done" [shape=box];
@@ -53,7 +54,8 @@ digraph execute {
     "Dispatch fix subagent → task-implement" -> "Dispatch reviewer subagent on diff";
     "Mark task done" -> "Pending tasks remain?";
     "Log blocked reason" -> "Pending tasks remain?";
-    "All tasks done/blocked?" -> "Close phase + update project.md" [label="yes"];
+    "All tasks done/blocked?" -> "Write carry-forward" [label="yes"];
+    "Write carry-forward" -> "Close phase + update project.md";
     "Close phase + update project.md" -> "Final phase?" ;
     "Final phase?" -> "Mark project done" [label="yes"];
     "Final phase?" -> "Instruct: next session" [label="no"];
@@ -80,6 +82,8 @@ Phase file:   <absolute path to .tasks/phase-N/phase.md>
 Spec:         <absolute path to the spec under .tasks/specs/ that produced this phase, from project.md's ## Specs log>
 
 Read project.md, the phase.md goal + exit criteria, and the spec. Also read the ## Notes of the most recent CLOSED phase's task files — later phases must build on what earlier phases actually learned.
+
+If phase.md has a "## Carry from phase <N-1>" section, it is the curated list of what the previous phase learned; treat the raw ## Notes as background, not as a second source of tasks. Every numbered item in it is required work: turn each into a task (or fold it into one) and name the carry item it covers in that task's title or Context. "## Open follow-ups from phase <N-1>" items become tasks only when they fall inside this phase's goal; otherwise leave them listed.
 
 Write one task file per unit of work into .tasks/phase-N/, named task-NN-<name>.md, using this exact format:
 ---
@@ -216,13 +220,18 @@ When all tasks are `done` or `blocked`:
    Return ONE compact verdict: "PASS", or "FAIL: <failing test/check names>". Do NOT paste full logs or stack traces.
    ```
 
-1. Update `phase.md`: `status: closed`, `closed: <date>`
-2. Update `project.md` task checklist for this phase: `- [x] Phase N: <title>`
-3. Increment `current-phase` in `project.md`
-4. Commit: `chore(phase-N): closed`
-5. Push
+1. **Write the carry-forward.** Lessons and follow-ups scattered across task `## Notes` are invisible to the next session's planner, so gather them into two sections:
+   - `## Carry from phase N` — numbered process/tooling fixes the next phase must make before or while it runs (each becomes a task when that phase is planned). One or two lines each, with the evidence that motivated it.
+   - `## Open follow-ups from phase N` — loose ends that are not setup work: items to recheck later, unmerged candidates, decisions still waiting on the user, sessions or branches not to touch.
 
-If this was the final phase: set `project.md` `status: done`, commit, push.
+   Source them from this phase's task `## Notes`, reviewer Minor findings recorded there, and BLOCKED reasons. Write "none" under a heading rather than omitting it, so the next session knows it was considered.
+
+   Where they go: if a next phase exists, place both sections after its goal in `.tasks/phase-<N+1>/phase.md`. If this is the final phase, nest them under a `## Carry-forward` heading in this phase's own `phase.md`, so `project-orchestrate` can copy them into the first phase of a later Extend.
+2. Update `phase.md`: `status: closed`, `closed: <date>`
+3. Update `project.md` task checklist for this phase: `- [x] Phase N: <title>`
+4. Increment `current-phase` in `project.md`; if this was the final phase, set `status: done` instead
+5. Commit everything from steps 1–4 (including the next phase's `phase.md`, when step 1 wrote to it) as `chore(phase-N): closed`
+6. Push
 
 ### Step 6 — Hand Off
 
@@ -230,10 +239,12 @@ Output to the human:
 
 > Phase N complete. X tasks done, Y blocked.
 > [If blocked tasks]: Review `.tasks/phase-N/` for blocked task details.
+> Carry-forward: K items + L open follow-ups written to `.tasks/phase-N+1/phase.md`.
 > Start a new session and invoke `phase-execute` for Phase N+1.
 
 Or if project is done:
 > Project complete. All phases closed. See `.tasks/project.md` for summary.
+> Carry-forward: K items + L open follow-ups recorded under `## Carry-forward` in `.tasks/phase-N/phase.md`; `project-orchestrate` picks them up if the project is extended.
 
 ## Communicating During the Loop
 

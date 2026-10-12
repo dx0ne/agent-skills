@@ -234,6 +234,7 @@ For each new phase, numbering from `K+1`:
 
 - Append `- [ ] Phase N: <title>` to `## Phases` in `.tasks/project.md`.
 - Create `.tasks/phase-N/phase.md` with `status: pending`, `opened: ~`, `closed: ~`, the goal, exit criteria, and an empty Tasks list. Do not pre-generate task files — `$phase-execute` generates them when it opens the phase.
+- For phase `K+1` only: if `phase-K/phase.md` has a `## Carry-forward` section (written by `$phase-execute` when it closed the last phase with no successor), copy its two subsections into the new `phase.md`, after the goal, as `## Carry from phase K` and `## Open follow-ups from phase K`. Leave `phase-K/phase.md` itself untouched, since closed phases are never modified.
 - Update `.tasks/project.md` frontmatter:
   - If `status: done`, flip to `status: in-progress`.
   - Set `current-phase` to the lowest phase number with `status: open` or `status: pending`. If a phase is already open, leave `current-phase` on it; otherwise it becomes `K+1`.
