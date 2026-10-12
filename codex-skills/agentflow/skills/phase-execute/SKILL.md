@@ -18,7 +18,7 @@ If none exists, find the lowest-numbered `status: pending` phase and open it. Wh
 - set `opened: <YYYY-MM-DD>`
 - generate task files if the phase does not have any yet
 
-Generating tasks is context-heavy (read `project.md`, the spec, and the prior phase's outcomes, then write N files). Every numbered item in the phase's `## Carry from phase <N-1>` section must become (or be folded into) a task that names it; `## Open follow-ups` items become tasks only when they fall inside the phase goal. If the user has enabled delegation, push this into a one-shot planner subagent that writes the task files and returns only a one-line summary — no explanation, no preamble — so the main thread stays lean for the execution loop. Otherwise generate them in-thread, but keep only the resulting files in mind, not the full breakdown reasoning.
+Generating tasks is context-heavy (read `project.md`, the spec, and the prior phase's outcomes, then write N files). Treat the phase's `## Carry from phase <N-1>` section as the curated list of what the prior phase learned (raw task notes are background only): every numbered item in it must become (or be folded into) a task that names it; `## Open follow-ups` items become tasks only when they fall inside the phase goal. If the user has enabled delegation, push this into a one-shot planner subagent that writes the task files and returns only a one-line summary — no explanation, no preamble — so the main thread stays lean for the execution loop. Otherwise generate them in-thread, but keep only the resulting files in mind, not the full breakdown reasoning.
 
 Generate tasks for the phase goal as written. Do not widen the phase's scope or add tasks for work a later phase owns.
 
@@ -73,13 +73,13 @@ If a task is blocked, record that in the phase-level reasoning but continue with
 
 When all tasks are `done` or `blocked`:
 - if the exit criteria need a full test-suite or build run, run it but keep only a compact verdict (PASS, or FAIL + failing-test names) — never retain full logs or stack traces in the thread; if delegation is enabled, run it in a verifier subagent that returns just that verdict
-- write the carry-forward into the next phase's `phase.md` (skip for the final phase): a `## Carry from phase N` section (numbered process/tooling fixes the next phase must make, each becomes a task when it is planned) and a `## Open follow-ups from phase N` section (recheck-later items, decisions waiting on the user, things not to touch). Source them from task `## Notes`, recorded Minor findings and blocked reasons; write "none" rather than omitting a heading. If the next phase does not exist yet, put both under `## Carry-forward` in this phase's `phase.md`
+- write the carry-forward: a `## Carry from phase N` section (numbered process/tooling fixes the next phase must make, each becomes a task when it is planned) and a `## Open follow-ups from phase N` section (recheck-later items, decisions waiting on the user, things not to touch). Source them from task `## Notes`, recorded Minor findings and blocked reasons; write "none" rather than omitting a heading. Place both after the goal in the next phase's `phase.md`; for the final phase, nest them under `## Carry-forward` in this phase's `phase.md` so `$project-orchestrate` can pick them up on a later extend
 - update `phase.md` to `status: closed`
 - set `closed: <YYYY-MM-DD>`
 - update `.tasks/project.md` to check off the phase
 - advance `current-phase` if another phase remains
 
-If the final phase is closed, set project status to `done`.
+If the final phase is closed, set project status to `done`. Commit the close, including the next phase's `phase.md` when the carry-forward went there.
 
 ### Step 7: Hand off
 
@@ -87,6 +87,7 @@ Lead with the outcome, then the detail. Return a concise summary:
 - which phase ran
 - counts of done and blocked tasks
 - whether the next phase is ready
+- how many carry items and open follow-ups were written, and to which `phase.md`
 - where to inspect blocked task notes if any remain
 
 ## Communicating During the Loop
